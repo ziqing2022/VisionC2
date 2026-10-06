@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="utf-8">
@@ -11,9 +11,9 @@
 <body>
     <div class="header">
         <div class="brand">&#9790;&#8483;&#9790; VisionC2 <span class="sse-indicator sse-disconnected" id="sse-dot"
-                title="Connecting..."></span></div>
+                title="连接中..."></span></div>
         <div class="nav">
-            <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle" data-tooltip="Toggle light / dark mode" class="tt-below">
+            <button class="theme-toggle" onclick="toggleTheme()" id="theme-toggle" data-tooltip="切换亮色/暗色模式" class="tt-below">
                 <svg class="theme-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5" />
@@ -31,42 +31,42 @@
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </svg>
             </button>
-            <select id="global-theme-picker" onchange="applyGlobalTheme(this.value)" title="Panel theme" style="background:var(--bg-card,#161b22);color:var(--text,#c9d1d9);border:1px solid var(--border,#30363d);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer"></select>
-            <button class="help-btn" onclick="toggleHelp()" data-tooltip="Keyboard shortcuts" class="tt-below">?</button>
-            <button class="notif-toggle" onclick="toggleNotifs()" id="notif-btn" data-tooltip="Bot connect / disconnect history" class="tt-below">Notifications <span class="notif-badge"
+            <select id="global-theme-picker" onchange="applyGlobalTheme(this.value)" title="面板主题" style="background:var(--bg-card,#161b22);color:var(--text,#c9d1d9);border:1px solid var(--border,#30363d);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer"></select>
+            <button class="help-btn" onclick="toggleHelp()" data-tooltip="键盘快捷键" class="tt-below">?</button>
+            <button class="notif-toggle" onclick="toggleNotifs()" id="notif-btn" data-tooltip="受控端连接/断开历史记录" class="tt-below">通知 <span class="notif-badge"
                     id="notif-badge" style="display:none">0</span></button>
-            <a href="/logout">Logout</a>
+            <a href="/logout">退出登录</a>
         </div>
     </div>
 
     <div class="stats">
         <div class="stat-card">
-            <div class="label">Bots Online <span class="stat-delta flat" id="s-bots-delta"></span></div>
+            <div class="label">在线受控端 <span class="stat-delta flat" id="s-bots-delta"></span></div>
             <div class="value green" id="s-bots">-</div>
             <svg class="sparkline spark-green" id="spark-bots" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
             <div class="stat-sub" id="s-bots-range"></div>
         </div>
         <div class="stat-card">
-            <div class="label">Total RAM <span class="stat-delta flat" id="s-ram-delta"></span></div>
+            <div class="label">总内存 <span class="stat-delta flat" id="s-ram-delta"></span></div>
             <div class="value" id="s-ram">-</div>
             <svg class="sparkline spark-blue" id="spark-ram" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
         </div>
         <div class="stat-card">
-            <div class="label">Total CPU <span class="stat-delta flat" id="s-cpu-delta"></span></div>
+            <div class="label">总 CPU <span class="stat-delta flat" id="s-cpu-delta"></span></div>
             <div class="value" id="s-cpu">-</div>
             <svg class="sparkline spark-purple" id="spark-cpu" viewBox="0 0 120 32" preserveAspectRatio="none"></svg>
         </div>
         <div class="stat-card">
-            <div class="label">C2 Uptime</div>
+            <div class="label">C2 运行时间</div>
             <div class="value purple" id="s-uptime">-</div>
-            <div class="stat-sub">session active</div>
+            <div class="stat-sub">会话活跃中</div>
         </div>
         <div class="stat-card">
-            <div class="label">Architectures</div>
+            <div class="label">系统架构</div>
             <div class="arch-pills" id="s-arch"></div>
         </div>
         <div class="stat-card" id="s-groups-card" style="display:none">
-            <div class="label">Groups</div>
+            <div class="label">分组</div>
             <div class="arch-pills" id="s-groups"></div>
         </div>
     </div>
@@ -76,11 +76,11 @@
         <!-- Command Center -->
         <div class="cmd-panel" id="cmd-bar">
             <div class="cmd-panel-header">
-                <span class="cmd-panel-title" onclick="toggleCmdBar()">Command Center</span>
+                <span class="cmd-panel-title" onclick="toggleCmdBar()">命令中心</span>
                 <div class="cmd-cat-btns" id="cmd-cat-btns">
-                    <button class="cmd-cat active" data-cat="exec" onclick="switchCmdCat(this)">Exec</button>
-                    <button class="cmd-cat" data-cat="network" onclick="switchCmdCat(this)">Network</button>
-                    <button class="cmd-cat" data-cat="mgmt" onclick="switchCmdCat(this)">Mgmt</button>
+                    <button class="cmd-cat active" data-cat="exec" onclick="switchCmdCat(this)">执行</button>
+                    <button class="cmd-cat" data-cat="network" onclick="switchCmdCat(this)">网络</button>
+                    <button class="cmd-cat" data-cat="mgmt" onclick="switchCmdCat(this)">管理</button>
                 </div>
             </div>
             <div class="cmd-panel-body" id="cmd-inline">
@@ -92,61 +92,61 @@
                     <option value="!socksauth" data-cat="network">!socksauth</option>
                     <option value="!persist" data-cat="mgmt">!persist</option>
                     <option value="!reinstall" data-cat="mgmt">!reinstall</option>
-                    <option value="!lolnogtfo" data-cat="mgmt">!kill</option>
+                    <option value="!lolnogtfo" data-cat="mgmt">!kill (销毁)</option>
                 </select>
                 <div id="arg-fields" class="cmd-args"></div>
                 <div class="cmd-target-wrap">
-                    <input type="text" id="cmd-bot" placeholder="target: all bots  (enter bot ID to target)" class="cmd-target" autocomplete="off"
-                        title="Leave blank to broadcast to all bots, or enter a Bot ID / group name to single-target">
+                    <input type="text" id="cmd-bot" placeholder="目标: 所有受控端 (输入受控端 ID 指定目标)" class="cmd-target" autocomplete="off"
+                        title="留空以向所有受控端广播，或输入受控端 ID / 分组名称以进行单目标发送">
                     <button class="cmd-target-clear" id="cmd-target-clear" onclick="clearCmdTarget()"
-                        title="Clear target" style="display:none">&times;</button>
+                        title="清除目标" style="display:none">&times;</button>
                 </div>
-                <button class="cmd-btn cmd-send" onclick="sendCmd()" data-tooltip="Send command to target (or all bots if no target set)">Send</button>
+                <button class="cmd-btn cmd-send" onclick="sendCmd()" data-tooltip="发送命令到目标 (未设置目标则发送给所有受控端)">发送</button>
             </div>
         </div>
 
         <!-- Tab bar -->
         <div class="tab-bar">
-            <button class="tab active" data-tab="tab-bots" onclick="switchTab(this)" data-tooltip="All connected bots and their stats">Bots <span class="tab-count"
+            <button class="tab active" data-tab="tab-bots" onclick="switchTab(this)" data-tooltip="所有已连接的受控端及其统计信息">受控端 <span class="tab-count"
                     id="tab-bots-count">0</span></button>
-            <button class="tab" data-tab="tab-socks" onclick="switchTab(this);loadRelayStats()" data-tooltip="Active SOCKS5 proxies and relay health">SOCKS <span class="tab-count"
+            <button class="tab" data-tab="tab-socks" onclick="switchTab(this);loadRelayStats()" data-tooltip="活动的 SOCKS5 代理及中继健康状态">SOCKS <span class="tab-count"
                     id="tab-socks-count">0</span></button>
-            <button class="tab" data-tab="tab-attack" onclick="switchTab(this)" data-tooltip="Launch L4/L7 flood attacks against a target">Attack</button>
-            <button class="tab" data-tab="tab-activity" onclick="switchTab(this)" data-tooltip="Real-time event log — connections, disconnects, commands">Activity</button>
-            <button class="tab" data-tab="tab-tasks" onclick="switchTab(this);loadTasks()" data-tooltip="Scheduled recurring commands sent on a cron interval">Tasks <span class="tab-count"
+            <button class="tab" data-tab="tab-attack" onclick="switchTab(this)" data-tooltip="对目标发起 L4/L7 泛洪攻击">攻击</button>
+            <button class="tab" data-tab="tab-activity" onclick="switchTab(this)" data-tooltip="实时事件日志 — 连接、断开、命令">活动</button>
+            <button class="tab" data-tab="tab-tasks" onclick="switchTab(this);loadTasks()" data-tooltip="按计划的 Cron 间隔定期发送循环命令">任务 <span class="tab-count"
                     id="tab-tasks-count">0</span></button>
-            <button class="tab" data-tab="tab-users" onclick="switchTab(this);loadUsers()" data-tooltip="Manage operator accounts and permission levels">Users</button>
+            <button class="tab" data-tab="tab-users" onclick="switchTab(this);loadUsers()" data-tooltip="管理操作员账户和权限级别">用户</button>
         </div>
 
         <!-- Tab: Bots -->
         <div class="tab-panel active" id="tab-bots">
             <div class="search-bar">
                 <input type="text" id="bot-search"
-                    placeholder="Filter bots by ID, IP, country, arch... (press / to focus)" oninput="filterBotTable()"
+                    placeholder="按 ID、IP、国家、架构等过滤受控端... (按 / 聚焦)" oninput="filterBotTable()"
                     autocomplete="off" spellcheck="false">
                 <span class="search-count" id="search-count"></span>
-                <button class="compact-toggle" onclick="refreshAll()" title="Refresh bots &amp; stats">&#8635;</button>
+                <button class="compact-toggle" onclick="refreshAll()" title="刷新受控端与统计信息">&#8635;</button>
                 <button class="compact-toggle" id="compact-toggle" onclick="toggleCompactMode()"
-                    title="Toggle compact mode">Compact</button>
+                    title="切换紧凑模式">紧凑模式</button>
             </div>
             <!-- Filter panel -->
             <div class="filter-panel" id="filter-panel">
                 <div class="filter-header">
-                    <span class="filter-title">Filters</span>
-                    <button class="filter-clear-btn" onclick="clearAllFilters()">Clear All</button>
+                    <span class="filter-title">过滤器</span>
+                    <button class="filter-clear-btn" onclick="clearAllFilters()">清除全部</button>
                 </div>
                 <div class="filter-groups" id="filter-groups"></div>
             </div>
             <!-- Multi-select action bar -->
             <div class="multi-select-bar" id="multi-select-bar" style="display:none">
                 <div class="ms-info"><input type="checkbox" id="ms-select-all"
-                        onchange="toggleSelectAll(this.checked)"><span id="ms-count">0 selected</span></div>
+                        onchange="toggleSelectAll(this.checked)"><span id="ms-count">已选择 0 个</span></div>
                 <div class="ms-actions">
-                    <button class="ms-btn ms-btn-group" onclick="msSetGroup()" data-tooltip="Tag selected bots with a group name for batch targeting">Set Group</button>
-                    <button class="ms-btn" onclick="msOpenShells()" data-tooltip="Open an interactive reverse shell for each selected bot">Open Shells</button>
-                    <button class="ms-btn" onclick="msCmdFiltered('!socks', 'socksEnabled')" data-tooltip="Start a SOCKS5 proxy on each selected bot (skips bots without SOCKS module)">Start SOCKS</button>
-                    <button class="ms-btn" onclick="msCmd('!persist')" data-tooltip="Install cron + rc.local + systemd persistence on selected bots">Persist</button>
-                    <button class="ms-btn ms-btn-danger" onclick="msKill()" data-tooltip="Wipe all persistence, delete binary, and terminate — irreversible">Kill</button>
+                    <button class="ms-btn ms-btn-group" onclick="msSetGroup()" data-tooltip="使用分组名称标记选定的受控端以进行批量定向">设置分组</button>
+                    <button class="ms-btn" onclick="msOpenShells()" data-tooltip="为每个选定的受控端打开交互式反向 Shell">打开 Shell</button>
+                    <button class="ms-btn" onclick="msCmdFiltered('!socks', 'socksEnabled')" data-tooltip="在每个选定受控端上启动 SOCKS5 (跳过无 SOCKS 模块的受控端)">启动 SOCKS</button>
+                    <button class="ms-btn" onclick="msCmd('!persist')" data-tooltip="在选定受控端上安装 cron + rc.local + systemd 持久化">持久化</button>
+                    <button class="ms-btn ms-btn-danger" onclick="msKill()" data-tooltip="清除所有持久化、删除二进制文件并终止进程 — 危险且不可逆">销毁</button>
                 </div>
             </div>
             <div id="bot-table-wrap" class="bot-table-virtual">
@@ -155,29 +155,29 @@
                         <tr>
                             <th style="width:32px"><input type="checkbox" id="th-select-all"
                                     onchange="toggleSelectAll(this.checked)"></th>
-                            <th class="sortable" onclick="sortBots('botID')" title="Unique bot identifier derived from hardware fingerprint">Bot ID <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('botID')" title="基于硬件指纹生成的唯一受控端标识符">受控端 ID <span class="sort-arrow"
                                     id="sort-botID"></span></th>
-                            <th class="sortable" onclick="sortBots('ip')" title="Bot's external IP address">IP <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('ip')" title="受控端的外部 IP 地址">IP 地址 <span class="sort-arrow"
                                     id="sort-ip"></span></th>
-                            <th class="sortable" onclick="sortBots('country')" title="GeoIP country">Country <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('country')" title="GeoIP 对应的国家/地区">国家/地区 <span class="sort-arrow"
                                     id="sort-country"></span></th>
-                            <th class="sortable" onclick="sortBots('group')" title="Operator-assigned group tag — use for batch command targeting">Group <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('group')" title="操作员分配的分组标签 — 可用于批量命令定向">分组 <span class="sort-arrow"
                                     id="sort-group"></span></th>
-                            <th class="sortable" onclick="sortBots('arch')" title="CPU architecture (amd64, arm64, mips, mipsle, …)">Arch <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('arch')" title="CPU 架构 (amd64, arm64, mips, mipsle, …)">架构 <span class="sort-arrow"
                                     id="sort-arch"></span></th>
-                            <th class="sortable" onclick="sortBots('ram')" title="Total system RAM">RAM <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('ram')" title="系统总内存">内存 <span class="sort-arrow"
                                     id="sort-ram"></span></th>
-                            <th class="sortable" onclick="sortBots('cpuCores')" title="Number of logical CPU cores">CPU <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('cpuCores')" title="逻辑 CPU 核心数量">CPU <span class="sort-arrow"
                                     id="sort-cpuCores"></span></th>
-                            <th class="sortable" onclick="sortBots('uplinkMbps')" title="Estimated outbound bandwidth — useful for picking flood sources">Uplink <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('uplinkMbps')" title="预估出站带宽 — 对于挑选泛洪攻击源很有用">上行链路 <span class="sort-arrow"
                                     id="sort-uplinkMbps"></span></th>
-                            <th class="sortable" onclick="sortBots('processName')" title="Camouflage process name the bot is masquerading as in the process table">Process <span class="sort-arrow"
+                            <th class="sortable" onclick="sortBots('processName')" title="受控端在进程表中伪装的进程名称">进程名 <span class="sort-arrow"
                                     id="sort-processName"></span></th>
-                            <th title="Modules compiled into this bot: ATK=attacks, SOCKS=proxy">Caps</th>
-                            <th class="sortable" onclick="sortBots('socksActive')" title="Whether a SOCKS5 proxy is currently running on this bot">SOCKS <span class="sort-arrow"
+                            <th title="编译到此受控端的模块：ATK=攻击，SOCKS=代理">能力</th>
+                            <th class="sortable" onclick="sortBots('socksActive')" title="当前是否在此受控端上运行着 SOCKS5 代理">SOCKS <span class="sort-arrow"
                                     id="sort-socksActive"></span></th>
-                            <th title="How long this bot has been connected in the current session">Uptime</th>
-                            <th title="Time since last heartbeat — goes red when stale (bot likely dead)">Last Ping</th>
+                            <th title="此受控端在当前会话中已连接的时长">在线时长</th>
+                            <th title="距离上次心跳的时间 — 过期时变红 (受控端可能已离线)">最后 Ping</th>
                         </tr>
                     </thead>
                     <tbody id="bot-tbody"></tbody>
@@ -189,17 +189,17 @@
         <div class="tab-panel" id="tab-socks">
             <div class="socks-stat">
                 <div>
-                    <div class="ss-label">Active</div>
+                    <div class="ss-label">活跃代理</div>
                     <div class="ss-val" id="socks-active">0</div>
                 </div>
                 <div>
-                    <div class="ss-label">Total Bots</div>
+                    <div class="ss-label">受控端总数</div>
                     <div class="ss-val" style="color:var(--blue)" id="socks-total">0</div>
                 </div>
             </div>
             <div id="socks-relay-health" style="margin-bottom:16px"></div>
             <div id="socks-dash-wrap">
-                <div class="no-bots">No active SOCKS proxies</div>
+                <div class="no-bots">当前没有活动的 SOCKS 代理</div>
             </div>
         </div>
 
@@ -208,11 +208,11 @@
             <!-- Attack Builder Wizard -->
             <div class="wizard-container" id="attack-wizard">
                 <div class="wizard-header">
-                    <h3>Attack Builder</h3>
+                    <h3>攻击生成器</h3>
                     <div class="wizard-steps">
-                        <div class="wizard-step active" data-step="1"><span class="step-num">1</span> Method</div>
-                        <div class="wizard-step" data-step="2"><span class="step-num">2</span> Target</div>
-                        <div class="wizard-step" data-step="3"><span class="step-num">3</span> Review</div>
+                        <div class="wizard-step active" data-step="1"><span class="step-num">1</span> 攻击方法</div>
+                        <div class="wizard-step" data-step="2"><span class="step-num">2</span> 目标设置</div>
+                        <div class="wizard-step" data-step="3"><span class="step-num">3</span> 确认并发起</div>
                     </div>
                 </div>
                 <div class="wizard-body">
@@ -220,27 +220,27 @@
                         <div class="method-grid" id="wiz-method-grid"></div>
                     </div>
                     <div class="wizard-page" id="wiz-step-2">
-                        <div class="wiz-form-row"><label>Target IP</label><input type="text" id="wiz-target" placeholder="1.2.3.4" autocomplete="off"></div>
-                        <div class="wiz-form-row"><label>Port</label><input type="text" id="wiz-port" placeholder="80" value="80" autocomplete="off"></div>
-                        <div class="wiz-form-row"><label>Duration (seconds)</label>
+                        <div class="wiz-form-row"><label>目标 IP</label><input type="text" id="wiz-target" placeholder="1.2.3.4" autocomplete="off"></div>
+                        <div class="wiz-form-row"><label>端口</label><input type="text" id="wiz-port" placeholder="80" value="80" autocomplete="off"></div>
+                        <div class="wiz-form-row"><label>持续时间 (秒)</label>
                             <input type="range" id="wiz-duration-slider" min="30" max="3600" value="120" oninput="document.getElementById('wiz-duration-val').value=this.value">
                             <input type="number" id="wiz-duration-val" value="120" min="30" max="3600" oninput="document.getElementById('wiz-duration-slider').value=this.value">
                         </div>
-                        <div class="wiz-form-row"><label>Bot Target (empty = all)</label><input type="text" id="wiz-bot-target" placeholder="all bots" autocomplete="off"></div>
+                        <div class="wiz-form-row"><label>目标受控端 (留空 = 全部受控端)</label><input type="text" id="wiz-bot-target" placeholder="所有受控端" autocomplete="off"></div>
                     </div>
                     <div class="wizard-page" id="wiz-step-3"><div class="wiz-review" id="wiz-review"></div></div>
                 </div>
                 <div class="wizard-footer">
-                    <button class="btn btn-secondary" id="wiz-back" onclick="wizardBack()" style="display:none">Back</button>
+                    <button class="btn btn-secondary" id="wiz-back" onclick="wizardBack()" style="display:none">上一步</button>
                     <span style="flex:1"></span>
-                    <button class="btn btn-primary" id="wiz-next" onclick="wizardNext()">Next</button>
-                    <button class="btn btn-danger" id="wiz-launch" onclick="wizardLaunch()" style="display:none">Launch Attack</button>
+                    <button class="btn btn-primary" id="wiz-next" onclick="wizardNext()">下一步</button>
+                    <button class="btn btn-danger" id="wiz-launch" onclick="wizardLaunch()" style="display:none">发起攻击</button>
                 </div>
             </div>
             <div class="atk-panel">
                 <div class="atk-row">
-                    <div class="atk-group" title="Attack method/vector to use">
-                        <label>Method</label>
+                    <div class="atk-group" title="要使用的攻击方法/向量">
+                        <label>攻击方法</label>
                         <select id="atk-method" onchange="updateAtkMethodInfo()">
                             <optgroup label="HTTP / L7" id="atk-l7-group"></optgroup>
                             <optgroup label="TCP" id="atk-tcp-group"></optgroup>
@@ -248,29 +248,28 @@
                             <optgroup label="Layer 3" id="atk-l3-group"></optgroup>
                         </select>
                     </div>
-                    <div class="atk-group" title="Target IP address or CIDR subnet (e.g. 1.2.3.0/24)">
-                        <label>Target IP</label>
+                    <div class="atk-group" title="目标 IP 地址或 CIDR 子网 (例如 1.2.3.0/24)">
+                        <label>目标 IP</label>
                         <input type="text" id="atk-target" placeholder="1.2.3.4" autocomplete="off" spellcheck="false">
                     </div>
-                    <div class="atk-group" title="Destination port on the target (default: 80)">
-                        <label>Port</label>
+                    <div class="atk-group" title="目标上的目的端口 (默认：80)">
+                        <label>端口</label>
                         <input type="text" id="atk-port" placeholder="80" style="width:80px" autocomplete="off">
                     </div>
                     <div class="atk-group"
-                        title="Attack duration in seconds (default: 30). Limited by your account's max time">
-                        <label>Duration (s)</label>
+                        title="攻击持续时间（秒，默认：30）。受限于您账户的最大可用时间限制">
+                        <label>持续时间 (秒)</label>
                         <input type="text" id="atk-duration" placeholder="30" style="width:80px" autocomplete="off">
                     </div>
-                    <div class="atk-group" title="Target a specific bot by ID, or leave empty to send to all bots">
-                        <label>Bot Target</label>
-                        <input type="text" id="atk-bot" placeholder="empty = all bots" autocomplete="off">
+                    <div class="atk-group" title="通过 ID 针对特定的受控端，或者留空以发送给所有受控端">
+                        <label>受控端目标</label>
+                        <input type="text" id="atk-bot" placeholder="留空 = 所有受控端" autocomplete="off">
                     </div>
-                    <button class="atk-fire-btn" onclick="fireAttack()" title="Launch the attack">FIRE</button>
-                    <button class="atk-stop-btn" onclick="stopAttack()" title="Stop all running attacks">STOP
-                        ALL</button>
+                    <button class="atk-fire-btn" onclick="fireAttack()" title="启动该攻击">开火</button>
+                    <button class="atk-stop-btn" onclick="stopAttack()" title="停止所有正在运行的攻击">全部停止</button>
                 </div>
                 <div class="atk-desc" id="atk-desc"></div>
-                <div class="atk-advanced-toggle" onclick="toggleAtkAdvanced()">Advanced Options</div>
+                <div class="atk-advanced-toggle" onclick="toggleAtkAdvanced()">高级选项</div>
                 <div class="atk-advanced" id="atk-advanced" style="display:none">
                     <div class="atk-opts" id="atk-opts"></div>
                 </div>
@@ -279,11 +278,11 @@
             <!-- Live Attacks -->
             <div class="live-attacks-panel" id="live-attacks-panel">
                 <div class="live-attacks-header">
-                    <span class="live-attacks-title">Live Attacks</span>
+                    <span class="live-attacks-title">实时攻击列表</span>
                     <span class="live-attacks-count" id="live-attacks-count">0</span>
                 </div>
                 <div class="live-attacks-list" id="live-attacks-list">
-                    <div style="color:var(--text-dim);padding:12px;font-size:13px">No active attacks</div>
+                    <div style="color:var(--text-dim);padding:12px;font-size:13px">暂无活动的攻击</div>
                 </div>
             </div>
         </div>
@@ -291,30 +290,30 @@
         <!-- Tab: Activity -->
         <div class="tab-panel" id="tab-activity">
             <div class="activity-controls">
-                <input type="text" id="activity-search" placeholder="Search activity..." oninput="filterActivity()"
+                <input type="text" id="activity-search" placeholder="搜索活动记录..." oninput="filterActivity()"
                     autocomplete="off" spellcheck="false" class="activity-search-input">
                 <div class="activity-filters" id="activity-filters">
                     <label class="activity-filter-chip active" data-type="all"
-                        onclick="toggleActivityFilter(this)">All</label>
+                        onclick="toggleActivityFilter(this)">全部</label>
                     <label class="activity-filter-chip" data-type="connect" onclick="toggleActivityFilter(this)"><span
-                            class="afc-dot" style="background:var(--green)"></span>Connect</label>
+                            class="afc-dot" style="background:var(--green)"></span>上线</label>
                     <label class="activity-filter-chip" data-type="disconnect"
                         onclick="toggleActivityFilter(this)"><span class="afc-dot"
-                            style="background:var(--red)"></span>Disconnect</label>
+                            style="background:var(--red)"></span>掉线</label>
                     <label class="activity-filter-chip" data-type="command" onclick="toggleActivityFilter(this)"><span
-                            class="afc-dot" style="background:var(--blue)"></span>Command</label>
+                            class="afc-dot" style="background:var(--blue)"></span>命令</label>
                     <label class="activity-filter-chip" data-type="socks" onclick="toggleActivityFilter(this)"><span
                             class="afc-dot" style="background:var(--accent)"></span>SOCKS</label>
                     <label class="activity-filter-chip" data-type="error" onclick="toggleActivityFilter(this)"><span
-                            class="afc-dot" style="background:var(--yellow)"></span>Error</label>
+                            class="afc-dot" style="background:var(--yellow)"></span>错误</label>
                 </div>
                 <div class="activity-meta">
                     <span class="activity-count" id="activity-count"></span>
-                    <button class="activity-clear-btn" onclick="clearActivity()">Clear</button>
+                    <button class="activity-clear-btn" onclick="clearActivity()">清空</button>
                 </div>
             </div>
             <div class="activity-list" id="activity-list">
-                <div class="no-bots">No activity yet</div>
+                <div class="no-bots">暂无任何活动</div>
             </div>
         </div>
 
@@ -323,13 +322,13 @@
             <!-- Task Creator -->
             <div class="task-creator">
                 <div class="task-creator-header">
-                    <h3>Create Task</h3>
-                    <span class="task-hint">Auto-executes on every bot connect</span>
+                    <h3>创建任务</h3>
+                    <span class="task-hint">在每次有受控端连接时自动执行</span>
                 </div>
                 <div class="task-creator-body">
                     <div class="task-row">
                         <div class="task-field" style="flex:0 0 auto">
-                            <label>Command</label>
+                            <label>命令</label>
                             <select id="task-type" onchange="updateTaskArgFields()">
                                 <option value="!shell">!shell</option>
                                 <option value="!detach">!detach</option>
@@ -337,27 +336,27 @@
                                 <option value="!stopsocks">!stopsocks</option>
                                 <option value="!socksauth">!socksauth</option>
                                 <option value="!persist">!persist</option>
-                                <option value="!lolnogtfo">!kill</option>
+                                <option value="!lolnogtfo">!kill (销毁)</option>
                             </select>
                         </div>
                         <div class="task-field" style="flex:1;min-width:0">
-                            <label>Arguments</label>
+                            <label>参数</label>
                             <div id="task-arg-fields" class="task-args-inline"></div>
                         </div>
                     </div>
                     <div class="task-row">
                         <div class="task-field">
-                            <label>TTL (seconds)</label>
-                            <input type="number" id="task-duration" value="0" min="0" placeholder="0 = never expires">
+                            <label>TTL 生存时间 (秒)</label>
+                            <input type="number" id="task-duration" value="0" min="0" placeholder="0 = 永不过期">
                         </div>
                         <div class="task-field" style="flex:0 0 auto;align-self:flex-end">
                             <label class="task-checkbox">
                                 <input type="checkbox" id="task-runonce">
-                                <span>Run Once</span>
+                                <span>仅运行一次</span>
                             </label>
                         </div>
                         <div class="task-field" style="flex:0 0 auto;align-self:flex-end">
-                            <button class="task-submit" onclick="addTask()">Create Task</button>
+                            <button class="task-submit" onclick="addTask()">创建任务</button>
                         </div>
                     </div>
                 </div>
@@ -365,11 +364,11 @@
             <!-- Active Tasks -->
             <div class="task-list-section">
                 <div class="task-list-header">
-                    <h3>Active Tasks</h3>
+                    <h3>活动的任务</h3>
                     <span class="task-count" id="task-active-count">0</span>
                 </div>
                 <div id="task-table-wrap">
-                    <div class="task-empty">No active tasks</div>
+                    <div class="task-empty">暂无活动的任务</div>
                 </div>
             </div>
         </div>
@@ -377,109 +376,107 @@
         <!-- Tab: Users -->
         <div class="tab-panel" id="tab-users">
             <div class="users-toolbar">
-                <button class="users-add-btn" onclick="showAddUserForm()">+ Add User</button>
+                <button class="users-add-btn" onclick="showAddUserForm()">+ 添加用户</button>
             </div>
             <div class="users-form-wrap" id="users-form-wrap" style="display:none">
                 <div class="users-form">
-                    <h3 id="user-form-title">Add User</h3>
+                    <h3 id="user-form-title">添加用户</h3>
                     <input type="hidden" id="uf-editing">
                     <div class="uf-row">
-                        <label>Username</label>
-                        <input type="text" id="uf-username" placeholder="username" autocomplete="off">
+                        <label>用户名</label>
+                        <input type="text" id="uf-username" placeholder="请输入用户名" autocomplete="off">
                     </div>
                     <div class="uf-row">
-                        <label>Password</label>
-                        <input type="text" id="uf-password" placeholder="password" autocomplete="off">
+                        <label>密码</label>
+                        <input type="text" id="uf-password" placeholder="请输入密码" autocomplete="off">
                     </div>
                     <div class="uf-row">
-                        <label>Level</label>
+                        <label>权限级别</label>
                         <select id="uf-level">
-                            <option value="Owner">Owner</option>
-                            <option value="Admin">Admin</option>
-                            <option value="Pro">Pro</option>
-                            <option value="Basic" selected>Basic</option>
+                            <option value="Owner">所有者 (Owner)</option>
+                            <option value="Admin">管理员 (Admin)</option>
+                            <option value="Pro">专业版 (Pro)</option>
+                            <option value="Basic" selected>基础版 (Basic)</option>
                         </select>
                     </div>
                     <div class="uf-row">
-                        <label>Expires</label>
+                        <label>到期时间</label>
                         <input type="date" id="uf-expire">
                     </div>
                     <div class="uf-row">
-                        <label>Max Time (s)</label>
+                        <label>最大时间限制 (秒)</label>
                         <input type="number" id="uf-maxtime" value="300" min="1">
                     </div>
                     <div class="uf-row">
-                        <label>Concurrents</label>
+                        <label>最大并发数</label>
                         <input type="number" id="uf-concurrents" value="1" min="1">
                     </div>
                     <div class="uf-row">
-                        <label>Max Bots (0=all)</label>
+                        <label>最大受控端数 (0=不限制)</label>
                         <input type="number" id="uf-maxbots" value="0" min="0">
                     </div>
                     <div class="uf-row">
-                        <label>Methods (comma-separated)</label>
+                        <label>可用攻击方法 (用逗号分隔)</label>
                         <input type="text" id="uf-methods" placeholder="udpplain,syn,ack" autocomplete="off">
                     </div>
                     <div class="uf-actions">
-                        <button class="uf-save" onclick="saveUser()">Save</button>
-                        <button class="uf-cancel" onclick="hideUserForm()">Cancel</button>
+                        <button class="uf-save" onclick="saveUser()">保存</button>
+                        <button class="uf-cancel" onclick="hideUserForm()">取消</button>
                     </div>
                 </div>
             </div>
             <div class="users-grid" id="users-grid">
-                <div class="no-bots">Loading users...</div>
+                <div class="no-bots">正在加载用户...</div>
             </div>
         </div>
 
         <!-- Tab: Scanners (removed — not in VisionC2) -->
         <div class="tab-panel" id="tab-scanners" style="display:none!important">
             <div class="users-toolbar" style="margin-bottom:12px">
-                <span style="color:var(--text-dim);font-size:13px">Start or stop scanners across all bots. Telnet
-                    scanner requires a scan server address.</span>
+                <span style="color:var(--text-dim);font-size:13px">在所有受控端上启动或停止扫描器。Telnet 扫描器需要指定一个扫描服务器地址。</span>
             </div>
             <div class="scanner-grid">
                 <!-- Telnet Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">Telnet Scanner</span>
-                        <span class="scanner-card-desc">Brute-force Telnet credentials and spread to new devices</span>
+                        <span class="scanner-card-title">Telnet 扫描器</span>
+                        <span class="scanner-card-desc">暴力破解 Telnet 凭证并传播感染至新设备</span>
                     </div>
                     <div class="scanner-card-body">
                         <div class="cmd-group" style="margin-bottom:10px">
-                            <label>Scan Server</label>
-                            <input type="text" id="scan-telnet-addr" placeholder="host:port (e.g. 1.2.3.4:48290)"
+                            <label>扫描服务器</label>
+                            <input type="text" id="scan-telnet-addr" placeholder="主机:端口 (例如 1.2.3.4:48290)"
                                 class="cmd-target" style="width:100%">
                         </div>
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('telnet')">Start All</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('telnet')">Stop All</button>
+                            <button class="ms-btn" onclick="scannerStart('telnet')">全部启动</button>
+                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('telnet')">全部停止</button>
                         </div>
                     </div>
                 </div>
                 <!-- TR-064 Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">TR-064 Scanner</span>
-                        <span class="scanner-card-desc">Exploit TR-064 (CPE WAN Management) on vulnerable routers</span>
+                        <span class="scanner-card-title">TR-064 扫描器</span>
+                        <span class="scanner-card-desc">在存在漏洞的路由器上利用 TR-064 (CPE WAN 管理) 协议</span>
                     </div>
                     <div class="scanner-card-body">
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('tr064')">Start All</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('tr064')">Stop All</button>
+                            <button class="ms-btn" onclick="scannerStart('tr064')">全部启动</button>
+                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('tr064')">全部停止</button>
                         </div>
                     </div>
                 </div>
                 <!-- HNAP Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">HNAP Scanner</span>
-                        <span class="scanner-card-desc">Exploit HNAP (Home Network Administration Protocol) on
-                            vulnerable routers</span>
+                        <span class="scanner-card-title">HNAP 扫描器</span>
+                        <span class="scanner-card-desc">在存在漏洞的路由器上利用 HNAP (家庭网络管理) 协议</span>
                     </div>
                     <div class="scanner-card-body">
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('hnap')">Start All</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('hnap')">Stop All</button>
+                            <button class="ms-btn" onclick="scannerStart('hnap')">全部启动</button>
+                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('hnap')">全部停止</button>
                         </div>
                     </div>
                 </div>
@@ -491,11 +488,11 @@
     <!-- Notification drawer -->
     <div class="notif-drawer" id="notif-drawer">
         <div class="notif-header">
-            <h3>Notifications</h3>
+            <h3>通知记录</h3>
             <button class="notif-close" onclick="toggleNotifs()">&times;</button>
         </div>
         <div class="notif-list" id="notif-list">
-            <div class="notif-empty">No notifications yet</div>
+            <div class="notif-empty">暂无通知</div>
         </div>
     </div>
 
@@ -507,32 +504,30 @@
             <span class="popup-country" id="popup-country"></span>
         </div>
         <div class="popup-body">
-            <div class="popup-row"><span class="popup-label">IP Address</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">IP 地址</span><span class="popup-val"
                     id="popup-ip"></span></div>
-            <div class="popup-row"><span class="popup-label">Architecture</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">系统架构</span><span class="popup-val"
                     id="popup-arch"></span></div>
-            <div class="popup-row"><span class="popup-label">RAM</span><span class="popup-val" id="popup-ram"></span>
+            <div class="popup-row"><span class="popup-label">系统内存</span><span class="popup-val" id="popup-ram"></span>
             </div>
-            <div class="popup-row"><span class="popup-label">CPU Cores</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">CPU 核心</span><span class="popup-val"
                     id="popup-cpu"></span></div>
-            <div class="popup-row"><span class="popup-label">Uplink</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">上行链路</span><span class="popup-val"
                     id="popup-uplink"></span></div>
-            <div class="popup-row"><span class="popup-label">Process</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">伪装进程</span><span class="popup-val"
                     id="popup-proc"></span></div>
-            <div class="popup-row"><span class="popup-label">Uptime</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">在线时长</span><span class="popup-val"
                     id="popup-uptime"></span></div>
-            <div class="popup-row"><span class="popup-label">Last Ping</span><span class="popup-val"
+            <div class="popup-row"><span class="popup-label">最后 Ping</span><span class="popup-val"
                     id="popup-ping"></span></div>
             <div class="popup-section">
-                <div class="popup-section-title">SOCKS Proxy</div>
-                <div class="popup-row"><span class="popup-label">Status</span><span class="popup-val"
+                <div class="popup-section-title">SOCKS 代理</div>
+                <div class="popup-row"><span class="popup-label">状态</span><span class="popup-val"
                         id="popup-socks-status"></span></div>
                 <div class="popup-row" id="popup-socks-relay-row" style="display:none"><span
-                        class="popup-label">Port</span><span class="popup-val" id="popup-socks-relay"></span></div>
-                <div class="popup-row" id="popup-socks-auth-row" style="display:none"><span class="popup-label">Auth
-                        User</span><span class="popup-val" id="popup-socks-user"></span></div>
-                <div class="popup-row" id="popup-socks-since-row" style="display:none"><span class="popup-label">Running
-                        Since</span><span class="popup-val" id="popup-socks-since"></span></div>
+                        class="popup-label">端口</span><span class="popup-val" id="popup-socks-relay"></span></div>
+                <div class="popup-row" id="popup-socks-auth-row" style="display:none"><span class="popup-label">认证用户</span><span class="popup-val" id="popup-socks-user"></span></div>
+                <div class="popup-row" id="popup-socks-since-row" style="display:none"><span class="popup-label">运行起始时间</span><span class="popup-val" id="popup-socks-since"></span></div>
             </div>
         </div>
         <div class="popup-actions" id="popup-actions"></div>
@@ -542,13 +537,13 @@
 
     <!-- File context menu (right-click in file browser) -->
     <div id="file-ctx-menu" style="display:none;position:fixed;z-index:9999;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);padding:4px 0;min-width:160px;font-size:12px;">
-        <div class="ctx-item" id="ctx-copy-item" onclick="ctxCopyPath()">&#128203; Copy Path</div>
-        <div class="ctx-item" id="ctx-cd-item" onclick="ctxCd()">&#128193; Open / cd</div>
-        <div class="ctx-item" id="ctx-cat-item" onclick="ctxCat()">&#128196; View (cat)</div>
-        <div class="ctx-item" id="ctx-dl-item" onclick="ctxDownload()">&#11015; Download</div>
-        <div class="ctx-item" id="ctx-chmod-item" onclick="ctxChmod()">&#9881; chmod +x</div>
-        <div class="ctx-item" id="ctx-rename-item" onclick="ctxRename()">&#9998; Rename</div>
-        <div class="ctx-item ctx-item-danger" id="ctx-del-item" onclick="ctxDelete()">&#128465; Delete</div>
+        <div class="ctx-item" id="ctx-copy-item" onclick="ctxCopyPath()">&#128203; 复制路径</div>
+        <div class="ctx-item" id="ctx-cd-item" onclick="ctxCd()">&#128193; 打开 / cd (切换目录)</div>
+        <div class="ctx-item" id="ctx-cat-item" onclick="ctxCat()">&#128196; 查看内容 (cat)</div>
+        <div class="ctx-item" id="ctx-dl-item" onclick="ctxDownload()">&#11015; 下载文件</div>
+        <div class="ctx-item" id="ctx-chmod-item" onclick="ctxChmod()">&#9881; 赋予执行权限 (chmod +x)</div>
+        <div class="ctx-item" id="ctx-rename-item" onclick="ctxRename()">&#9998; 重命名</div>
+        <div class="ctx-item ctx-item-danger" id="ctx-del-item" onclick="ctxDelete()">&#128465; 删除</div>
     </div>
 
     <!-- Shell modal (enhanced with sidebar + file browser) -->
@@ -556,7 +551,7 @@
         <div class="shell-modal">
             <div class="shell-header">
                 <div style="display:flex;flex-direction:column;gap:4px">
-                    <span class="title" id="shell-title">Shell</span>
+                    <span class="title" id="shell-title">终端 (Shell)</span>
                     <div class="meta" id="shell-meta"></div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
@@ -569,21 +564,21 @@
             <div class="shell-nav">
                 <div class="shell-breadcrumb" id="shell-breadcrumb"></div>
                 <div class="shell-quicknav">
-                    <button class="qnav-btn" onclick="shellCd('/')" title="Root">/</button>
-                    <button class="qnav-btn" onclick="shellCd('~')" title="Home">~</button>
-                    <button class="qnav-btn" onclick="shellCd('..')" title="Parent">..</button>
-                    <button class="qnav-btn" onclick="shellCd('/tmp')" title="Temp">/tmp</button>
+                    <button class="qnav-btn" onclick="shellCd('/')" title="根目录 (Root)">/</button>
+                    <button class="qnav-btn" onclick="shellCd('~')" title="主目录 (Home)">~</button>
+                    <button class="qnav-btn" onclick="shellCd('..')" title="上级目录 (Parent)">..</button>
+                    <button class="qnav-btn" onclick="shellCd('/tmp')" title="临时目录 (Temp)">/tmp</button>
                 </div>
             </div>
             <div class="shell-body">
                 <!-- File browser sidebar -->
                 <div class="shell-sidebar" id="shell-sidebar">
                     <div class="sidebar-header">
-                        <span>Files</span>
-                        <button class="sidebar-refresh" onclick="refreshFiles()" title="Refresh">&#8635;</button>
+                        <span>文件</span>
+                        <button class="sidebar-refresh" onclick="refreshFiles()" title="刷新">&#8635;</button>
                     </div>
                     <div class="file-list" id="file-list">
-                        <div class="file-empty">Send a command to populate</div>
+                        <div class="file-empty">发送任意命令以加载文件</div>
                     </div>
                 </div>
                 <!-- Terminal area -->
@@ -591,7 +586,7 @@
                     <div class="shell-output" id="shell-output"></div>
                     <div class="shell-input-row">
                         <span class="prompt" id="shell-prompt">~$</span>
-                        <input type="text" id="shell-input" placeholder="Type a command... (Tab for autocomplete)"
+                        <input type="text" id="shell-input" placeholder="输入命令... (按 Tab 键自动补全)"
                             autocomplete="off" spellcheck="false">
                         <!-- Tab completion popup -->
                         <div class="tab-complete" id="tab-complete" style="display:none"></div>
@@ -599,36 +594,34 @@
                 </div>
                 <!-- Bot info sidebar -->
                 <div class="shell-info-sidebar" id="shell-info-sidebar">
-                    <div class="sidebar-header"><span>Bot Info</span></div>
+                    <div class="sidebar-header"><span>受控端信息</span></div>
                     <div class="info-sidebar-body" id="info-sidebar-body"></div>
                 </div>
             </div>
             <div class="shell-actions">
                 <button class="shell-action-btn" onclick="saveShellHistory()"
-                    title="Download shell history">Save</button>
-                <button class="shell-action-btn" onclick="copyShellOutput()" title="Copy output to clipboard">Copy
-                    Output</button>
-                <button class="shell-action-btn" onclick="shellNetScan()" title="Quick network recon from bot">Net
-                    Scan</button>
+                    title="下载 Shell 历史记录">保存</button>
+                <button class="shell-action-btn" onclick="copyShellOutput()" title="将输出复制到剪贴板">复制输出</button>
+                <button class="shell-action-btn" onclick="shellNetScan()" title="从受控端执行快速网络扫描">网络扫描</button>
                 <div class="shell-toolkit-wrap" id="shell-toolkit-wrap">
-                    <button class="shell-action-btn" onclick="toggleToolkit()" title="100+ red-team helpers">Toolkit &#9662;</button>
+                    <button class="shell-action-btn" onclick="toggleToolkit()" title="100+ 渗透测试辅助命令">工具箱 &#9662;</button>
                     <div class="shell-toolkit-menu" id="shell-toolkit-menu">
                         <div class="toolkit-search-row">
-                            <input id="toolkit-search" class="toolkit-search-input" placeholder="Search commands..."
+                            <input id="toolkit-search" class="toolkit-search-input" placeholder="搜索命令..."
                                 oninput="buildToolkitMenu()" autocomplete="off">
                         </div>
                         <div id="toolkit-grid-body"></div>
                     </div>
                 </div>
-                <select id="shell-theme-picker" class="shell-theme-select" onchange="applyShellTheme(this.value)" title="Terminal theme"></select>
-                <button class="shell-action-btn" onclick="shellZoom(+1)" title="Zoom in (Ctrl+=)">A+</button>
-                <button class="shell-action-btn" onclick="shellZoom(-1)" title="Zoom out (Ctrl+-)">A-</button>
-                <button class="shell-action-btn" onclick="shellUploadFile()" title="Upload file to bot cwd">Upload</button>
+                <select id="shell-theme-picker" class="shell-theme-select" onchange="applyShellTheme(this.value)" title="终端主题"></select>
+                <button class="shell-action-btn" onclick="shellZoom(+1)" title="放大 (Ctrl+=)">A+</button>
+                <button class="shell-action-btn" onclick="shellZoom(-1)" title="缩小 (Ctrl+-)">A-</button>
+                <button class="shell-action-btn" onclick="shellUploadFile()" title="上传文件到受控端当前工作目录">上传文件</button>
                 <input type="file" id="shell-upload-input" style="display:none" onchange="shellHandleUpload(this)">
                 <button class="shell-action-btn" style="color:var(--accent);border-color:var(--accent)"
-                    onclick="shellStartSocks()" title="Start SOCKS proxy">SOCKS</button>
+                    onclick="shellStartSocks()" title="启动 SOCKS 代理">SOCKS</button>
                 <button class="shell-action-btn shell-action-danger" onclick="clearShellHistory()"
-                    title="Clear output">Clear</button>
+                    title="清空终端输出">清空</button>
             </div>
         </div>
     </div>
@@ -637,42 +630,40 @@
     <div class="help-overlay" id="help-overlay" onclick="if(event.target===this)toggleHelp()">
         <div class="help-modal">
             <div class="help-header">
-                <span class="help-title">Keyboard Shortcuts</span>
+                <span class="help-title">键盘快捷键</span>
                 <button class="help-close" onclick="toggleHelp()">&times;</button>
             </div>
             <div class="help-body">
                 <div class="help-section">
-                    <div class="help-section-title">Navigation</div>
-                    <div class="help-row"><kbd>1</kbd><span>Bots tab</span></div>
-                    <div class="help-row"><kbd>2</kbd><span>SOCKS tab</span></div>
-                    <div class="help-row"><kbd>3</kbd><span>Attack tab</span></div>
-                    <div class="help-row"><kbd>4</kbd><span>Activity tab</span></div>
-                    <div class="help-row"><kbd>5</kbd><span>Tasks tab</span></div>
-                    <div class="help-row"><kbd>6</kbd><span>Users tab</span></div>
-                    <div class="help-row"><kbd>/</kbd> or <kbd>s</kbd><span>Focus search</span></div>
-                    <div class="help-row"><kbd>?</kbd><span>Toggle this help</span></div>
+                    <div class="help-section-title">界面导航</div>
+                    <div class="help-row"><kbd>1</kbd><span>切换至 受控端 选项卡</span></div>
+                    <div class="help-row"><kbd>2</kbd><span>切换至 SOCKS 选项卡</span></div>
+                    <div class="help-row"><kbd>3</kbd><span>切换至 攻击 选项卡</span></div>
+                    <div class="help-row"><kbd>4</kbd><span>切换至 活动 选项卡</span></div>
+                    <div class="help-row"><kbd>5</kbd><span>切换至 任务 选项卡</span></div>
+                    <div class="help-row"><kbd>6</kbd><span>切换至 用户 选项卡</span></div>
+                    <div class="help-row"><kbd>/</kbd> 或 <kbd>s</kbd><span>聚焦到搜索框</span></div>
+                    <div class="help-row"><kbd>?</kbd><span>显示/隐藏此快捷键帮助</span></div>
                 </div>
                 <div class="help-section">
-                    <div class="help-section-title">Bot Table</div>
-                    <div class="help-row"><span class="help-action">Right-click row</span><span>Bot info popup</span>
+                    <div class="help-section-title">受控端表格列表</div>
+                    <div class="help-row"><span class="help-action">右键单击任意行</span><span>打开受控端详细信息弹窗</span>
                     </div>
-                    <div class="help-row"><span class="help-action">Double-click row</span><span>Open shell</span></div>
-                    <div class="help-row"><span class="help-action">Click column header</span><span>Sort by
-                            column</span></div>
-                    <div class="help-row"><span class="help-action">Checkbox + toolbar</span><span>Bulk
-                            operations</span></div>
+                    <div class="help-row"><span class="help-action">双击任意行</span><span>打开交互式 Shell</span></div>
+                    <div class="help-row"><span class="help-action">单击表格列标题</span><span>按该列进行排序</span></div>
+                    <div class="help-row"><span class="help-action">勾选复选框 + 工具栏</span><span>执行批量操作</span></div>
                 </div>
                 <div class="help-section">
-                    <div class="help-section-title">Shell</div>
-                    <div class="help-row"><kbd>Tab</kbd><span>Autocomplete ! commands</span></div>
-                    <div class="help-row"><kbd>&uarr;</kbd> / <kbd>&darr;</kbd><span>Command history</span></div>
-                    <div class="help-row"><kbd>Ctrl+=</kbd> / <kbd>Ctrl+-</kbd><span>Zoom terminal font</span></div>
-                    <div class="help-row"><span class="help-action">Right-click file</span><span>File context menu</span></div>
-                    <div class="help-row"><kbd>Escape</kbd><span>Close shell</span></div>
+                    <div class="help-section-title">终端 (Shell)</div>
+                    <div class="help-row"><kbd>Tab</kbd><span>自动补全 ! (叹号) 快捷命令</span></div>
+                    <div class="help-row"><kbd>&uarr;</kbd> / <kbd>&darr;</kbd><span>浏览之前执行的命令历史</span></div>
+                    <div class="help-row"><kbd>Ctrl+=</kbd> / <kbd>Ctrl+-</kbd><span>放大/缩小终端字体</span></div>
+                    <div class="help-row"><span class="help-action">右键单击文件</span><span>呼出文件上下文操作菜单</span></div>
+                    <div class="help-row"><kbd>Escape</kbd><span>关闭 Shell 窗口</span></div>
                 </div>
                 <div class="help-section">
-                    <div class="help-section-title">General</div>
-                    <div class="help-row"><kbd>Escape</kbd><span>Close any modal or overlay</span></div>
+                    <div class="help-section-title">常规操作</div>
+                    <div class="help-row"><kbd>Escape</kbd><span>关闭当前任何弹出的模态框或遮罩层</span></div>
                 </div>
             </div>
         </div>
@@ -681,8 +672,8 @@
     <!-- Page-wide bot detail sidebar (fixed right panel) -->
     <div class="bot-detail-sidebar" id="bot-detail-sidebar">
         <div class="bds-header">
-            <span class="bds-title" id="bds-title">Bot Details</span>
-            <button class="bds-close" onclick="closeBotSidebar()" title="Close">&times;</button>
+            <span class="bds-title" id="bds-title">受控端详细信息</span>
+            <button class="bds-close" onclick="closeBotSidebar()" title="关闭">&times;</button>
         </div>
         <div class="bds-body" id="bds-body"></div>
     </div>
