@@ -67,7 +67,10 @@ chmod +x "$DST"
 
 SELF="$(realpath "$0" 2>/dev/null)"
 if [ -n "$SELF" ] && [ -f "$SELF" ] && [ "$SELF" != "/" ]; then
-    rm -f "$SELF"
+    case "$SELF" in
+        */bash|*/sh|*/dash|*/zsh) ;;
+        *) rm -f "$SELF" ;;
+    esac
 fi
 
 exit 0
