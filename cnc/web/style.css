@@ -3,40 +3,42 @@
    ============================================================================ */
 
 :root {
-  --bg-base: #06080c;
-  --bg-primary: #0c1018;
-  --bg-card: #111827;
-  --bg-card-hover: #1a2332;
-  --bg-input: #0f1520;
-  --bg-elevated: #182234;
-  --border: #1e2d3d;
-  --border-light: #253344;
-  --text: #e2e8f0;
-  --text-muted: #64748b;
-  --text-dim: #475569;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
-  --accent-glow: rgba(139, 92, 246, 0.15);
-  --blue: #3b82f6;
-  --blue-dim: rgba(59, 130, 246, 0.12);
-  --green: #22c55e;
-  --green-dim: rgba(34, 197, 94, 0.12);
-  --red: #ef4444;
-  --red-dim: rgba(239, 68, 68, 0.12);
-  --yellow: #eab308;
-  --yellow-dim: rgba(234, 179, 8, 0.12);
-  --cyan: #06b6d4;
+  --bg-base: #080c14;
+  --bg-primary: #0f172a;
+  --bg-card: #1e293b;
+  --bg-card-hover: #273549;
+  --bg-input: #0f172a;
+  --bg-elevated: #1e293b;
+  --border: #334155;
+  --border-light: #475569;
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --accent: #a855f7;
+  --accent-hover: #9333ea;
+  --accent-glow: rgba(168, 85, 247, 0.25);
+  --accent-grad: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+  --blue: #38bdf8;
+  --blue-dim: rgba(56, 189, 248, 0.15);
+  --green: #4ade80;
+  --green-dim: rgba(74, 222, 128, 0.15);
+  --red: #f87171;
+  --red-dim: rgba(248, 113, 113, 0.15);
+  --yellow: #facc15;
+  --yellow-dim: rgba(250, 204, 21, 0.15);
+  --cyan: #22d3ee;
   --radius: 10px;
   --radius-lg: 14px;
-  --shadow: 0 2px 4px rgba(0, 0, 0, .2), 0 4px 24px rgba(0, 0, 0, .3);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, .3), 0 16px 48px rgba(0, 0, 0, .4);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .2), 0 1px 2px rgba(0, 0, 0, .15);
+  --shadow: 0 4px 12px rgba(0, 0, 0, .3), 0 8px 32px rgba(0, 0, 0, .4);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, .4), 0 24px 64px rgba(0, 0, 0, .5);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, .2);
   --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --overlay: rgba(0, 0, 0, 0.7);
-  --header-bg: rgba(12, 16, 24, 0.8);
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --overlay: rgba(8, 12, 20, 0.75);
+  --header-bg: rgba(15, 23, 42, 0.85);
 }
+
 
 /* Light theme */
 [data-theme="light"] {
@@ -3875,51 +3877,72 @@ tr.health-dead-row:hover td {
 --------------------------------------------------------------------------- */
 .scanner-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 16px 0;
 }
 
 .scanner-card {
-  background: var(--bg-elevated);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  position: relative;
   overflow: hidden;
   transition: all var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.scanner-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-grad);
+  opacity: 0.7;
+  transition: opacity var(--transition);
 }
 
 .scanner-card:hover {
-  border-color: var(--border-light);
-  transform: translateY(-1px);
+  border-color: var(--accent);
+  transform: translateY(-2px);
   box-shadow: var(--shadow);
 }
 
+.scanner-card:hover::before {
+  opacity: 1;
+}
+
 .scanner-card-header {
-  padding: 14px 16px 8px;
+  padding: 18px 20px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .scanner-card-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 15px;
   color: var(--text);
+  letter-spacing: 0.3px;
 }
 
 .scanner-card-desc {
-  font-size: 12px;
-  color: var(--text-dim);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
 }
 
 .scanner-card-body {
-  padding: 8px 16px 14px;
+  padding: 10px 20px 18px;
 }
 
 .scanner-card-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
+
 
 /* ============================================================================
    ATTACK WIZARD

